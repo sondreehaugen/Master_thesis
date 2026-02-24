@@ -1,0 +1,167 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+% =========================================================
+%                 PREAMBLE (ALL FORMATTING HERE)
+% =========================================================
+\usepackage{booktabs}
+
+% Encoding & language
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[norsk,english]{babel}
+
+% Marger
+\usepackage[a4paper,
+    left=3cm,
+    right=2.5cm,
+    top=2.8cm,
+    bottom=2.8cm]{geometry}
+
+
+% Bibliography
+\usepackage[round]{natbib}
+
+% Math
+\usepackage{amsmath, amsfonts, amssymb}
+
+% Typography
+\usepackage{microtype}
+
+% Typography
+\usepackage{microtype}
+
+% Widow/orphan control
+\widowpenalty=10000
+\clubpenalty=10000
+\raggedbottom
+
+
+% Graphics & figures
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage[labelfont=bf,labelsep=colon]{caption}
+\renewcommand{\figurename}{Fig.}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{booktabs}
+\usepackage{siunitx}
+
+% Layout & spacing
+\usepackage{setspace}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+\setlength{\abovecaptionskip}{6pt}
+\setlength{\belowcaptionskip}{10pt}
+
+% Section titles
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+% Sidetall-kontroll (Viktig for "X of Y")
+\usepackage[pagecontinue=true]{pageslts}
+
+% 1. Stil for FRONT MATTER (romertall, ingen "of X")
+\fancypagestyle{frontmatter}{
+    \fancyhf{}
+    \fancyfoot[R]{\thepage} 
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+% 2. Stil for MAIN MATTER (arabiske tall, "X of Y")
+\fancypagestyle{mainmatter}{
+    \fancyhf{}
+    \fancyhead[R]{\nouppercase{\leftmark}}
+    \fancyhead[L]{\nouppercase{\rightmark}}
+    \fancyfoot[R]{\thepage}
+    \renewcommand{\headrulewidth}{0.4pt}}
+
+% 3. Stil for kapittel-forsider (fjerner header, beholder "X of Y")
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \fancyfoot[R]{\thepage} 
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+% Overstyrer standard kapittel-stil
+\assignpagestyle{\chapter}{plain}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{#1}}
+
+\titleformat{\chapter}{\normalfont\huge\bfseries}{\thechapter}{1em}{}
+\titlespacing*{\chapter}{0pt}{-30pt}{-5pt}
+
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titlespacing*{\section}{0pt}{-10pt}{-5pt}
+
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titlespacing*{\subsection}{0pt}{0pt}{-5pt}
+
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{-5pt}
+
+
+% Hyperlinks
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks,
+    pdfauthor={Eirik Årdal Hjelm, Sondre Eliassen Haugen},
+    pdftitle={Preliminary Study for the Master's Thesis}
+}
+
+% =========================================================
+%                 DOCUMENT START
+% =========================================================
+\begin{document}
+
+% =========================
+% FRONT MATTER (Roman numerals)
+% =========================
+\pagenumbering{roman}
+%\pagestyle{frontmatter} % Stil uten "of X" for front matter
+
+% Forside
+\input{project/frontpage} 
+
+% Preface 
+\cleardoublepage
+\input{project/sections/preface}
+
+% Abstract
+\cleardoublepage
+\input{project/sections/abstract}
+
+% Toclist
+\cleardoublepage
+\pagestyle{frontmatter}
+\input{project/sections/toclist}
+
+% =========================
+% MAIN MATTER (Arabic numerals)
+% =========================
+\cleardoublepage
+\pagenumbering{arabic}   % Switch to Arabic numerals
+\setcounter{page}{1}     % Start from page 1
+\pagestyle{mainmatter}
+\assignpagestyle{\chapter}{plain}
+
+\begin{spacing}{1.5}
+
+\input{project/sections/introduction}
+\input{project/sections/theory}
+\input{project/sections/methods}
+\input{project/sections/results}
+\input{project/sections/discussion}
+\input{project/sections/conclusions}
+
+% =========================
+% BIBLIOGRAPHY
+\clearpage
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliographystyle{agsm}
+
+\bibliography{report}
+
+\end{spacing}
+\end{document}

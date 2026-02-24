@@ -1,0 +1,80 @@
+\chapter{Methods}
+\label{sec:methods}
+
+\section{Data Acquisition and Preparation}
+
+% Skal denne kamerastasjonen kun testes på? Hvilke kamerastasjoner skal vi bruke for å trene modellen? Relevant å bruke andre datasett i treningen? Eks. Mapillary, Cityscapes..
+\subsection{Data Source}
+
+The Norwegian Public Roads Administration operates 736 publicly accessible traffic camera stations across Norway. However, the majority of these stations provide only still images captured at ten-minute intervals and do not record continuous video streams. Among the limited number of stations that offer live video feeds, only a small subset is installed at intersections.
+
+The most relevant camera station is Fv587 Haukeland, Bergen (Direction Arna), which is shown in \autoref{fig:haukeland_bilde}. The intersection is an unsignalized T-junction, where a secondary road connects to the main road. Marked pedestrian crossings are present across the main approaches, and a bus bay with a sheltered stop is located along the roadside. The area around the intersection includes a small number of residential buildings, open land, and roadside vegetation.
+
+% Litt mer om hvorfor akkurat dette krysset?
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images/haukeland_bilde.png}
+    \caption[A snapshot of the video stream at Fv587 Haukeland]{A snapshot of the video stream at Fv587 Haukeland. Source: \cite{SVV_HaukelandKamera}}
+    \label{fig:haukeland_bilde}
+\end{figure}
+
+
+\subsection{Data Acquisition}
+\begin{itemize}
+    \item Hvordan video ble hentet (ffmpeg, m3u8-stream)
+    \item Tidsperiode for opptak (dato, klokkeslett, varighet
+    \item Segmenteringsstrategi (f.eks. 5-minutters klipp)
+    \item Totalt antall timer og antall filer
+\end{itemize}
+
+
+\subsection{Data Quality}
+\begin{itemize}
+    \item Videoformat
+    \item Oppløsning og FPS
+    \item Lysforhold
+    \item Værforhold
+\end{itemize}
+
+
+\subsection{Data Limitations}
+\begin{itemize}
+    \item Begrensninger: Ikke lagret historisk video, kun live-stream. Relativt lite trafikk i forhold til kryss midt i senturm.
+\end{itemize}
+
+
+\subsection{Data Preprocessing}
+\begin{itemize}
+    \item Annottering (YOLO-modeller klassifiserer vel i tre klasser? Dele inn kjøretøyene i flere klasser?)
+\end{itemize}
+
+
+\section{Technical Implementation Framework}
+
+\subsection*{Choice of Base Model}
+\begin{itemize}
+    \item Hvilken YOLO-modell, og hvorfor?
+    \item Modellstørrelse (YOLO-versjonene kommer i flere versjoner, fra lett til tung)
+    \item Pretrained weights på f.eks. COCO?
+\end{itemize}
+
+\subsection*{Model Architecture}
+\begin{itemize}
+    \item One-stage detector
+    \item Forklare modellen, kommer an på hvilken YOLO-modell vi lander på.
+    \item Figur av arkitekturen.
+\end{itemize}
+
+
+\subsection*{Transfer Learning and Metric Extraction}
+
+
+\section{Evaluation and Validation}
+
+
+
+\subsection*{Performance Metrics}
+
+
+\subsection*{Traffic Engineering Validation}
