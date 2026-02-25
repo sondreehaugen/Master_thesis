@@ -56,3 +56,17 @@ Thumbs.db
 
 # Overleaf sync metadata
 .overleaf/
+
+# YOLO model weights
+*.pt
+
+# Dataset images (store binærfiler)
+Model/images/
+Model/dataset/images/
+
+# Training runs og resultater
+Model/runs/
+
+# Auto-genererte dataset-filer (regenereres av prepare_dataset.py)
+Model/dataset/labels/
+*.cache

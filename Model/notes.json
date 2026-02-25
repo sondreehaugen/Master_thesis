@@ -1,0 +1,41 @@
+{
+  "categories": [
+    {
+      "id": 0,
+      "name": "Buss"
+    },
+    {
+      "id": 1,
+      "name": "Long combination vehicle"
+    },
+    {
+      "id": 2,
+      "name": "Semi-trailer"
+    },
+    {
+      "id": 3,
+      "name": "bicycle"
+    },
+    {
+      "id": 4,
+      "name": "car"
+    },
+    {
+      "id": 5,
+      "name": "motorcycle"
+    },
+    {
+      "id": 6,
+      "name": "person"
+    },
+    {
+      "id": 7,
+      "name": "truck"
+    }
+  ],
+  "info": {
+    "year": 2026,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}

@@ -1,0 +1,20 @@
+# dataset.yaml – YOLO dataset-konfigurasjon
+# Brukes av Ultralytics (YOLOv8 / YOLO11 osv.)
+
+path: ./dataset          # rot-mappe (relativt til denne filen)
+train: images/train
+val:   images/val
+
+# Antall klasser
+nc: 8
+
+# Klassenavn – må matche label-ID-ene (0-indeksert)
+names:
+  0: Buss
+  1: Long combination vehicle
+  2: Semi-trailer
+  3: bicycle
+  4: car
+  5: motorcycle
+  6: person
+  7: truck
