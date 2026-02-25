@@ -146,7 +146,7 @@ Machine learning (ML) is a subfield of artificial intelligence in which algorith
 
 Recent advances in deep learning have substantially improved the robustness of computer vision systems to real-world variability in illumination, viewpoint, and occlusion, by learning hierarchical feature representations from large-scale image datasets \citep{LeCun2015}. These properties are particularly relevant for traffic monitoring in complex outdoor environments, where conditions change continuously and manual data collection is both costly and inconsistent.
 
-Vision-based analysis tasks are commonly categorised into three progressively more complex problem types, each building on the previous, as illustrated in \autoref{fig:Classification}. \textbf{Image classification} assigns a single semantic label to an entire image but provides no spatial information about object location \citep{Krizhevsky2012}. \textbf{Object detection} extends this by simultaneously identifying object categories and localising each instance through bounding boxes, a capability that is essential for characterising the spatial distribution of vehicles, cyclists, and pedestrians at intersections \citep{Ma2024}. \textbf{Object tracking} further associates detections across consecutive video frames, enabling the reconstruction of object trajectories over time \citep{Bewley2016}. For intersection monitoring, tracking is the critical step that transforms frame-level detections into actionable traffic data, including turning movement counts, vehicle classifications, and conflict event identification.
+Vision-based analysis tasks are commonly categorised into three progressively more complex problem types, each building on the previous, as illustrated in \autoref{fig:Classification}. \textbf{Image classification} assigns a single semantic label to an entire image but provides no spatial information about object location \citep{Krizhevsky2012}. \textbf{Object detection} extends this by simultaneously identifying object categories and localising each instance through bounding boxes, a capability that is essential for characterising the spatial distribution of vehicles, cyclists, and pedestrians at intersections \citep{Ma2024}. \textbf{Object tracking} further associates detections across consecutive video frames, enabling the reconstruction of object trajectories over time \citep{Bewley2016}. For intersection monitoring, tracking is the critical step that transforms frame-level detections into actionable traffic data, including turning movement counts, vehicle class distributions, and downstream conflict event identification.
 
 \begin{figure}[H]
     \centering
@@ -162,7 +162,6 @@ Deep learning is a class of machine learning methods based on artificial neural 
 
 Convolutional neural networks (CNNs) represent the foundational deep learning architecture for computer vision. CNNs exploit the spatial structure of image data through convolutional layers, which apply learnable filters across local regions of the input. This mechanism allows CNNs to detect spatially local patterns, including edges, textures, and shapes, at any position in the image, a property known as translational equivariance \citep{LeCun2015}. A typical CNN architecture combines convolutional layers for feature extraction, nonlinear activation functions such as the Rectified Linear Unit (ReLU) to enable the modelling of complex decision boundaries \citep{Nair2010}, and pooling layers that reduce spatial resolution to increase robustness to minor positional variations and reduce computational cost.
 
-% lage egen figur
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\linewidth]{images/CNN.png}
@@ -275,7 +274,7 @@ identified. These characteristics make YOLO-based architectures a well-founded
 methodological basis for the detection pipeline developed in this thesis, as 
 discussed further in \autoref{sec:methodology}.
 
-\subsection{Multi-object tracking and trajectory extraction}
+\subsection{Multi-Object Tracking and Trajectory Extraction}
 \label{sec:multi_object_tracking}
 Measuring traffic parameters such as turning movements requires more than object detection alone; it necessitates Multi-Object Tracking. Multi-Object Tracking assigns a persistent and unique identifier to each detected road user across consecutive video frames, enabling trajectory estimation and movement analysis \citep{Hassan2024}.
 
