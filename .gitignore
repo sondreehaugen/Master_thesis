@@ -57,6 +57,10 @@ Thumbs.db
 # Overleaf sync metadata
 .overleaf/
 
+# Video files
+*.mp4
+*.avi
+
 # YOLO model weights
 *.pt
 
