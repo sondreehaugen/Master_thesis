@@ -61,9 +61,6 @@ Thumbs.db
 *.mp4
 *.avi
 
-# YOLO model weights
-*.pt
-
 # Dataset images (store binærfiler)
 Model/images/
 Model/dataset/images/
