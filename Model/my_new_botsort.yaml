@@ -11,7 +11,7 @@ fuse_score: True
 gmc_method: none
 
 # hvis du har/tenker å bruke ReID
-proximity_thresh: 0.7     # mer fleksibel posisjon
-appearance_thresh: 0.3    # mer fleksibel utseende ved blur
+proximity_thresh: 0.8     # mer fleksibel posisjon
+appearance_thresh: 0.1    # mer fleksibel utseende ved blur
 with_reid: True
 model: auto
