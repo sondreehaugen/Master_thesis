@@ -1,17 +1,17 @@
+tracker_type: botsort
 
-tracker_type: botsort # (str) Tracker backend: botsort|bytetrack; choose botsort to enable BoT-SORT features
-track_high_thresh: 0.25 # (float) First-stage match threshold; raise for cleaner tracks, lower to keep more
-track_low_thresh: 0.1 # (float) Second-stage threshold for low-score matches; balances recovery vs drift
-new_track_thresh: 0.4 # (float) Start a new track if no match ≥ this; higher reduces false tracks
-track_buffer: 240 # (int) Frames to keep lost tracks alive; higher handles occlusion, increases ID switches risk
-match_thresh: 0.8 # (float) Association similarity threshold (IoU/cost); tune with detector quality
-fuse_score: True # (bool) Fuse detection score with motion/IoU for matching; stabilizes weak detections
+track_high_thresh: 0.25
+track_low_thresh: 0.05    # litt lavere → mer tolerant mot svakere matches
+new_track_thresh: 0.5     # litt høyere → færre nyopprettede ID'er
 
-# BoT-SORT specifics
-gmc_method: none # (str) Fixed camera — motion compensation not needed, saves compute
+track_buffer: 180         # ca 6 s ved 30 FPS → bilen “lever lenger” selv om den er blurr
+match_thresh: 0.7         # lavere enn 0.8 → mer tolerant på IoU/score ved blur
+fuse_score: True
 
-# ReID model related thresh
-proximity_thresh: 0.5 # (float) Min IoU to consider tracks proximate for ReID; higher is stricter
-appearance_thresh: 0.3 # (float) Min appearance similarity for ReID; raise to avoid identity swaps
-with_reid: True # (bool) Enable ReID model use; needs extra model and compute
-model: auto # (str) ReID model name/path; "auto" uses detector features if available
+gmc_method: none
+
+# hvis du har/tenker å bruke ReID
+proximity_thresh: 0.7     # mer fleksibel posisjon
+appearance_thresh: 0.3    # mer fleksibel utseende ved blur
+with_reid: True
+model: auto
