@@ -1,17 +1,17 @@
 tracker_type: botsort
 
-track_high_thresh: 0.25
+track_high_thresh: 0.4
 track_low_thresh: 0.05    # litt lavere → mer tolerant mot svakere matches
-new_track_thresh: 0.5     # litt høyere → færre nyopprettede ID'er
+new_track_thresh: 0.5     # høyere → krever mer sikkerhet før ny track opprettes
 
-track_buffer: 300         # ca 6 s ved 30 FPS → bilen “lever lenger” selv om den er blurr
-match_thresh: 0.8         # lavere enn 0.8 → mer tolerant på IoU/score ved blur
-fuse_score: False
+track_buffer: 100          # ~1.5 s ved 30 FPS -> tåler korte occlusions bedre
+match_thresh: 0.75        # strengere matching reduserer ID-hop mellom ulike kjøretøy
+fuse_score: True
 
-gmc_method: none
+gmc_method: none # Statisk kamera, ingen geometrisk matching
 
 # hvis du har/tenker å bruke ReID
-proximity_thresh: 0.5     # mer fleksibel posisjon
-appearance_thresh: 0.25    # minimumslikhet for ReID-match (0=alt godkjennes, 1=kun identiske)
+proximity_thresh: 0.5     # krever nærmere geometrisk match
+appearance_thresh: 0.5   # strengere ReID for å unngå feil ID-overføring
 with_reid: True
 model: auto
