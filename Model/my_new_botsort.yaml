@@ -1,17 +1,16 @@
-tracker_type: botsort
+tracker_type: botsort # (str) Tracker backend: botsort|bytetrack; choose botsort to enable BoT-SORT features
+track_high_thresh: 0.25 # (float) First-stage match threshold; raise for cleaner tracks, lower to keep more
+track_low_thresh: 0.1 # (float) Second-stage threshold for low-score matches; balances recovery vs drift
+new_track_thresh: 0.25 # (float) Start a new track if no match ≥ this; higher reduces false tracks
+track_buffer: 30 # (int) Frames to keep lost tracks alive; higher handles occlusion, increases ID switches risk
+match_thresh: 0.8 # (float) Association similarity threshold (IoU/cost); tune with detector quality
+fuse_score: True # (bool) Fuse detection score with motion/IoU for matching; stabilizes weak detections
 
-track_high_thresh: 0.4
-track_low_thresh: 0.05    # litt lavere → mer tolerant mot svakere matches
-new_track_thresh: 0.5     # høyere → krever mer sikkerhet før ny track opprettes
+# BoT-SORT specifics
+gmc_method: none # (str) Global motion compensation: sparseOptFlow|orb|sift|ecc|none; helps moving camera scenes
 
-track_buffer: 100          # ~1.5 s ved 30 FPS -> tåler korte occlusions bedre
-match_thresh: 0.75        # strengere matching reduserer ID-hop mellom ulike kjøretøy
-fuse_score: True
-
-gmc_method: none # Statisk kamera, ingen geometrisk matching
-
-# hvis du har/tenker å bruke ReID
-proximity_thresh: 0.5     # krever nærmere geometrisk match
-appearance_thresh: 0.5   # strengere ReID for å unngå feil ID-overføring
-with_reid: True
-model: auto
+# ReID model related thresh
+proximity_thresh: 0.5 # (float) Min IoU to consider tracks proximate for ReID; higher is stricter
+appearance_thresh: 0.8 # (float) Min appearance similarity for ReID; raise to avoid identity swaps
+with_reid: False # (bool) Enable ReID model use; needs extra model and compute
+model: auto # (str) ReID model name/path; "auto" uses detector features if available
