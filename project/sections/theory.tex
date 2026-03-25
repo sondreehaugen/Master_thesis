@@ -160,7 +160,7 @@ Vision-based analysis tasks are commonly categorised into three progressively mo
 
 Deep learning is a class of machine learning methods based on artificial neural networks with multiple hidden layers, enabling the learning of complex, hierarchical representations from large-scale data \citep{Goodfellow-et-al-2016}. In contrast to shallow models, deep learning architectures are particularly effective for high-dimensional inputs such as images and video, where relevant features must be extracted directly from raw pixel data rather than engineered manually.
 
-Convolutional neural networks (CNNs) represent the foundational deep learning architecture for computer vision. CNNs exploit the spatial structure of image data through convolutional layers, which apply learnable filters across local regions of the input. This mechanism allows CNNs to detect spatially local patterns, including edges, textures, and shapes, at any position in the image, a property known as translational equivariance \citep{LeCun2015}. A typical CNN architecture combines convolutional layers for feature extraction, nonlinear activation functions such as the Rectified Linear Unit (ReLU) to enable the modelling of complex decision boundaries \citep{Nair2010}, and pooling layers that reduce spatial resolution to increase robustness to minor positional variations and reduce computational cost.
+Convolutional neural networks (CNNs) represent the foundational deep learning architecture for computer vision. CNNs exploit the spatial structure of image data through convolutional layers, which apply learnable filters organized into filter banks. These filters are trained and applied across the entire input, whether the original image or the output from a previous layer, by operating on local patches, typically in sizes such as 3×3 or 5×5 pixels. Because the local statistics of images are invariant to location, all units in a feature map share the same filter bank, enabling the network to detect the same local motifs and patterns regardless of their position in the image \citep{LeCun2015}. To enable the modelling of complex decision boundaries, these layers are combined with non-linear activation functions, most commonly the Rectified Linear Unit (ReLU) \citep{Nair2010}. As noted by \cite{LeCun2015}, these non-linear modules are essential for transforming representations into higher levels of abstraction; without multiple stages of non-linearity, the network would be unable to learn the intricate structures required for discrimination. Finally, the high-level features extracted by these layers are fed into fully connected layers, which function similarly to traditional neural networks by connecting every neuron to all neurons in adjacent layers to produce the final classification output \citep{OSheaNash2015}.
 
 \begin{figure}[H]
     \centering
@@ -272,7 +272,35 @@ camera frame, which is essential when monitoring intersections where vehicles
 of varying dimensions, cyclists, and pedestrians must all be reliably 
 identified. These characteristics make YOLO-based architectures a well-founded 
 methodological basis for the detection pipeline developed in this thesis, as 
-discussed further in \autoref{sec:methodology}.
+discussed further in \autoref{sec:methods}.
+
+\subsection{YOLO26 Architecture Overview}
+
+YOLO26 follows the classic single-stage, end-to-end object detection paradigm introduced in earlier Ultralytics YOLO versions. The network is composed of three main modules; backbone, neck, and head, and it processes an input image of size $640 \times 640 \times 3$. The architecture is defined in Ultralytics official \texttt{yolo26.yaml} configuration file and is fully described in the comprehensive analysis by Hidayatullah and Tubagus (2026). \autoref{fig:YOLO26_architecture} illustrates the complete CNN-based architecture of YOLO26, including the flow of feature maps and the location of the key components.
+
+The model supports five different scales (nano, small, medium, large, and extra-large) that are controlled by three scaling parameters: \texttt{depth\_multiple}, \texttt{width\_multiple}, and \texttt{max\_channels}.
+
+\subsubsection*{Backbone}
+The backbone of YOLO26 is responsible for hierarchical feature extraction from the input image (640 $\times$ 640 $\times$ 3). It consists of an initial pair of convolutional layers (kernel size 3, stride 2) that progressively reduce spatial resolution, followed by a sequence of C3k2 blocks (parameterised by \texttt{depth\_multiple}, \texttt{width\_multiple}, and \texttt{max\_channels}) interleaved with additional convolutional blocks \citep{hidayatullah2026yolo26}. The final stages include an enhanced SPPF module with a shortcut connection and a C2PSA block that incorporates self-attention for global context modelling. The last three backbone stages (P3, P4, P5) forward multi-scale feature maps to the neck.
+
+In general, the backbone's main objective is to progressively transform the raw input image into rich, multi-scale feature representations, capturing low-level details (edges, textures) in shallow layers and high-level semantic information (object context) in deeper layers.
+
+\subsubsection*{Neck}
+The neck of YOLO26 aggregates and fuses the multi-scale feature maps produced by the backbone. It begins with the SPPF module, followed by a C2PSA attention block, then alternates between upsampling (nearest-neighbour), concatenation, and additional C3k2 blocks \citep{hidayatullah2026yolo26}. Three refined feature maps (at 80 $\times$ 80, 40 $\times$ 40, and 20 $\times$ 20 resolution) are passed forward to the head.
+
+The neck's main objective is to combine semantic information from deeper layers with fine-grained spatial details from shallower layers. This multi-scale feature combination enables the model to detect objects effectively at different sizes.
+
+\subsubsection*{Head}
+The head of YOLO26 consists of three parallel detection branches connected to the neck outputs (P3 for small objects, P4 for medium objects, and P5 for large objects). Each branch comprises a C3k2 block followed by a final convolutional layer before the Detect module, which outputs bounding boxes, class probabilities, and objectness scores in an end-to-end, NMS-free manner \citep{hidayatullah2026yolo26}.
+
+The head's main objective is to translate the fused multi-scale features into the final set of predictions, which include bounding-box coordinates, confidence scores, and class labels.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images/YOLO26_architecture.png}
+    \caption{YOLO26 Architecture Diagram. Reproduced from \cite{hidayatullah2026yolo26}, available under \href{https://creativecommons.org/licenses/by/4.0/}{CC BY 4.0}.}
+    \label{fig:YOLO26_architecture}
+\end{figure}
 
 \subsection{Multi-Object Tracking and Trajectory Extraction}
 \label{sec:multi_object_tracking}
@@ -282,6 +310,46 @@ Detection-Based Tracking is the most widely used Multi-Object Tracking paradigm 
 
 The resulting trajectory data enable the extraction of traffic volume, modal split, and turning movement information required for capacity and intersection analysis.
 
+\section{Performance Evaluation Metrics}
+\label{sec:evaluation_metrics}
+To quantitatively assess the effectiveness of the YOLO architecture on the traffic dataset, several standard computer vision metrics are employed. These metrics evaluate the model's ability to both correctly localize and accurately classify vehicles \citep{vijayakumar2024yolo}.
+
+\subsection*{Intersection over Union (IoU)}
+The fundamental building block for evaluating detection accuracy is Intersection over Union (IoU). This metric measures the overlap between the predicted bounding box (\(B_p\)) and the ground truth box (\(B_gt\)) provided during the manual annotation. It is calculated as:
+
+\begin{equation}
+IoU = \frac{\text{Area}(B_p \cap B_{gt})}{\text{Area}(B_p \cup B_{gt})}
+\end{equation}
+
+\subsection*{Precision and Recall}
+Precision quantifies the ratio of correct detections relative to the total number of times the model claimed to have found an object. A high precision score indicates that the model rarely misidentifies background noise or incorrect vehicle types as a target class.
+
+\begin{equation}
+\text{Precision} = \frac{TP}{TP + FP}
+\end{equation}
+
+Recall, often referred to as the True Positive Rate or sensitivity, determines how many of the actual vehicles present in the ground truth data were successfully identified by the model. A high recall is vital to ensure that as few vehicles as possible pass through the frame undetected.
+
+\begin{equation}
+\text{Recall} = \frac{TP}{TP + FN}
+\end{equation}
+
+\subsection*{Average Precision (AP) and Mean Average Precicion (mAP)}
+Average Precision (AP) is defined as the area under the Precision-Recall Curve. It is a single numerical metric that summarizes the trade-off between precision and recall across all possible confidence thresholds for a specific object class. A high AP indicates that the model maintains both high precision and recall for a specific class. The AP is calculated as:
+
+\begin{equation}
+AP = \int_{0}^{1} p(r) \, dr
+\end{equation}
+
+Where \(p(r)\) is the precision as a function of recall.
+
+While the AP measures the performance for single class, Mean Average Precision (mAP) is the standard metric used to evaluate the overall performance of a multi-class object detection model like YOLO. If N represents the total number of classes, the mAP is calculated as:
+
+\begin{equation}
+mAP = \frac{1}{N} \sum_{i=1}^{N} AP_i
+\end{equation}
+
+The literature commonly reports two versions of mAP to provide a complete picture of model performance. The mAP$_{50}$ represents the mAP calculated at a fixed IoU treshold of 0.5. This means that a detection is labeled as a True Positive if the overlap between the predicted box and the GT box is minimum 50\%. Instead of using a single treshold, mAP$_{50}$-95 uses the average of mAP values calculated at ten different IoU tresholds from 0.5 to 0.95, in 0.05 increments. This metric rewards models for superior localization accuracy.
 
 \section{Literature Review and Research Gap}
 \label{sec:literature_review_research_gap}
@@ -294,7 +362,7 @@ Several studies have investigated the performance of deep learning models for ve
 
 \cite{Song2019VisionBasedVehicle} trained and evaluated a vision-based vehicle detection and counting system using YOLOv3 for object detection in combination with Oriented FAST and Rotated BRIEF (ORB), a feature detection and description algorithm, for multi-object tracking (MOT). The ORB algorithm extracts features within each detected bounding box and matches them across consecutive frames to maintain object correspondence over time \cite{Song2019VisionBasedVehicle}. The dataset consisted of images captured from a variety of viewpoints and included three vehicle classes: cars, buses, and trucks. The authors report a mean average precision (mAP) of 87.88\%, with very small class deviations from this value. Using ORB-based tracking, the system achieved a vehicle counting accuracy of 93.2\% and a direction recognition accuracy of 92.3\%, while maintaining processing speeds close to real time. Although these results demonstrate strong performance for traffic monitoring, the study is limited to highway environments and a small number of vehicle classes.
 
-\cite{smartcities6050134} performed a large-scale comparison of Single Shot Detector (SSD), Faster R-CNN, and multiple YOLO variants using video data from 9 different datasets, recorded under diverse conditions, including nighttime, adverse weather, occlusions, and varying camera viewpoints . Their results show that YOLO-based models consistently outperform SSD (Single Shot Multibox Detector) and Faster R-CNN in terms of detection accuracy, localization precision, and computational efficiency. In particular, YOLO variants achieved detection accuracies above 95\% and overall classification accuracies exceeding 90\% for cars, trucks, and buses, while maintaining near real-time inference speeds. Although Faster R-CNN demonstrated competitive performance in some localization tasks, its substantially higher computational cost limited its suitability for continuous video-based traffic surveillance. The study therefore concludes that YOLO-based architectures provide the most favorable trade-off between accuracy and efficiency for real-time traffic monitoring applications.
+\cite{smartcities6050134} performed a large-scale comparison of Single Shot Detector (SSD), Faster R-CNN, and multiple YOLO variants using video data from 9 different datasets, recorded under diverse conditions, including nighttime, adverse weather, occlusions, and varying camera viewpoints. Their results show that YOLO-based models consistently outperform SSD (Single Shot Multibox Detector) and Faster R-CNN in terms of detection accuracy, localization precision, and computational efficiency. In particular, YOLO variants achieved detection accuracies above 95\% and overall classification accuracies exceeding 90\% for cars, trucks, and buses, while maintaining near real-time inference speeds. Although Faster R-CNN demonstrated competitive performance in some localization tasks, its substantially higher computational cost limited its suitability for continuous video-based traffic surveillance. The study therefore concludes that YOLO-based architectures provide the most favorable trade-off between accuracy and efficiency for real-time traffic monitoring applications.
 
 \cite{YOLO-PEL} propose YOLOv8-PEL, a lightweight vehicle detection model built upon YOLOv8n, the smallest variant in the YOLOv8 family. The authors introduce architectural modifications aimed at improving multi-scale feature extraction and feature fusion, as well as a revised bounding box regression loss function to enhance localization stability. These changes reduce the number of model parameters and computational cost by approximately 25–30\% compared to the baseline YOLOv8n, while maintaining nearly identical mean average precision (mAP). The results demonstrate that lightweight architectural modifications can significantly improve real-time suitability without substantial loss in detection accuracy.
 

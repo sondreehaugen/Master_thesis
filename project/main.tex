@@ -45,6 +45,7 @@
 \usepackage{placeins}
 \usepackage{booktabs}
 \usepackage{siunitx}
+\usepackage{makecell}
 
 % Layout & spacing
 \usepackage{setspace}
@@ -160,8 +161,15 @@
 \clearpage
 \addcontentsline{toc}{chapter}{Bibliography}
 \bibliographystyle{agsm}
-
 \bibliography{report}
+
+
+% =========================
+% APPENDICES
+\clearpage
+\appendix % This is the magic command
+\input{project/sections/appendix} % Create this file for your extra data
 
 \end{spacing}
 \end{document}
+
