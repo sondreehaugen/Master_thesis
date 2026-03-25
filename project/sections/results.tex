@@ -1,3 +1,115 @@
 \chapter{Results}
-
 \label{sec:results}
+
+\section{YOLO26 Results}
+This section presents the performance of the YOLO26n and YOLO26m model for vehicle detection and classification. For YOLO26n, the training process was conducted for 74 epochs, at which point early stopping was triggered as the validation loss reached a plateau. The YOLO26m was stopped at epoch 97. The following results are evaluated based on both the validation dataset used during training and an independent test set to ensure the model's generalizability to unseen data. The train/val/test split is identical for both models.
+
+\subsection{Training and Validation}
+The training progress of the YOLO26n and YOLO26m models, measured via mAP$_{50}$-95, is presented in \autoref{fig:metrics_mAP$_{50}$-95}. The curves for both variants exhibit a consistent upward trajectory, with initial fluctuations that gradually diminish as training progresses. After approximately epoch 55, the performance of both models plateaus, indicating that they have reached their respective learning capacities for the given dataset and architecture.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m//comparison_metrics_mAP$_{50}$-95B.png}
+    \caption{Training progress comparison of YOLO26n and YOLO26m measured in mAP$_{50}$-95.}
+    \label{fig:metrics_mAP$_{50}$-95}
+\end{figure}
+
+Similarly, the mAP$_{50}$ progression (\autoref{fig:metrics_mAP$_{50}$}) follows a comparable learning curve, exhibiting a rapid performance increase within the initial 10-15 epochs. The model achieves a higher overall stability on this metric, peaking at approximately 0.77 for both models. The close alignment between the mAP$_{50}$ and mAP$_{50}$-95 trends further validates the model's reliability, showing that the improvements in detection accuracy were consistent across both strict and lenient IoU thresholds.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m//comparison_metrics_mAP$_{50}$B.png}
+    \caption{Training progress comparison of YOLO26n and YOLO26m measured in mAP$_{50}$-95.}
+    \label{fig:metrics_mAP$_{50}$}
+\end{figure}
+
+The Precision metric over the training duration for the YOLO26n and YOLO26m models is depicted in \autoref{fig:metrics_precision}. While both curves maintain a general upward trend, they exhibit higher volatility compared to the mAP metrics, with frequent fluctuations between epochs 10 and 50. Despite this variance, the YOLO26n model achieves a significant peak precision of approximately 0.83 around epoch 33, while the YOLO26m variant eventually stabilizes at higher values within the 0.75 to 0.80 range during the final phase of training.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m/comparison_metrics_precisionB.png}
+    \caption{Training progress comparison of YOLO26n and YOLO26m measured in Precision.}
+    \label{fig:metrics_precision}
+\end{figure}
+
+The progression of the Recall metric for the YOLO26n and YOLO26m models is illustrated in \autoref{fig:metrics_recall}. Both curves showcase an increasing proficiency in correctly identifying ground truth instances over the training period. The YOLO26n model achieves its highest recall, peaking at approximately 0.77 around epoch 52, while the YOLO26m variant reaches a comparable peak slightly later and stabilizes at higher values in the 0.72–0.76 range during the final epochs. This trend signifies that the models’ sensitivity improved consistently, ensuring that a high percentage of vehicles were successfully detected as training matured.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m/comparison_metrics_recallB.png}
+    \caption{Training progress comparison of YOLO26n and YOLO26m measured in Recall.}
+    \label{fig:metrics_recall}
+\end{figure}
+
+
+
+\subsection{Performance on Test Set}
+
+The final performance of both the YOLO26n and YOLO26m models was evaluated on the same independent test set of 151 images containing 585 object instances, as detailed in \autoref{tab:test_set_results_n} and Table \autoref{tab:test_set_results_m}. The YOLO26n model achieved an overall mAP$_{50}$ of 0.797 and an mAP$_{50}$-95 of 0.645, while the YOLO26m variant delivered noticeably stronger results with an mAP$_{50}$ of 0.866 and an mAP$_{50}$-95 of 0.696. In both cases, the test-set metrics slightly exceed the validation metrics recorded during training, indicating strong generalization capabilities and confirming that neither model is overfitted to the validation distribution.
+
+Analysis of individual classes shows that the ’Car’ category remains the most accurately detected for both models, with mAP$_{50}$ values of 0.968 (YOLO26n) and 0.980 (YOLO26m) and recall values above 0.96. Large vehicle categories such as ’Heavy Truck’ and ’Semi-trailer’ also demonstrated high reliability across both variants (mAP$_{50}$ of 0.874/0.861 and 0.841/0.903, respectively). While classes with fewer instances, such as ’Bus’ and ’Light Truck,’ exhibited comparatively lower precision, the overall consistency across diverse vehicle types, including the ’Person’ class (mAP$_{50}$ of 0.761 for YOLO26n and 0.898 for YOLO26m), confirms the effectiveness of both models in a variety of traffic scenarios.
+
+\begin{table}[H]
+\centering
+\caption{Final Performance Metrics on the Unseen Test Dataset (YOLO26n). No instances of motorcycles or bicycles ended up in the test set. }
+\label{tab:test_set_results_n}
+\begin{tabular}{lcccccc}
+\hline
+\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{R} & \textbf{mAP$_{50}$} & \textbf{mAP$_{50}$-95} \\ \hline
+All Classes & 151 & 585 & 0.679 & 0.765 & 0.797 & 0.645 \\ \hline
+Bus         & 15  & 15  & 0.439 & 0.667 & 0.697 & 0.570 \\
+Car         & 131 & 474 & 0.813 & 0.960 & 0.968 & 0.785 \\
+Heavy Truck & 37  & 41  & 0.793 & 0.780 & 0.874 & 0.789 \\
+Light Truck & 14  & 14  & 0.518 & 0.571 & 0.640 & 0.562 \\
+Person      & 13  & 16  & 0.796 & 0.734 & 0.761 & 0.419 \\
+Semi-trailer* & 25 & 25 & 0.717 & 0.880 & 0.841 & 0.745 \\ \hline
+\multicolumn{7}{l}{\small *Full class name: Semi-trailer / combination vehicle}
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\caption{Final Performance Metrics on the Unseen Test Dataset (YOLO26m).}
+\label{tab:test_set_results_m}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{Recall} & \textbf{mAP$_{50}$} & \textbf{mAP$_{50}$-95} \\ 
+\midrule
+\textbf{All} & 151 & 585 & 0.831 & 0.789 & 0.866 & 0.696 \\ 
+\midrule
+Bus & 15 & 15 & 0.924 & 0.809 & 0.944 & 0.824 \\ 
+Car & 131 & 474 & 0.926 & 0.964 & 0.980 & 0.827 \\ 
+Heavy Truck & 37 & 41 & 0.824 & 0.829 & 0.861 & 0.783 \\ 
+Light Truck & 14 & 14 & 0.777 & 0.500 & 0.610 & 0.471 \\ 
+Person & 13 & 16 & 0.823 & 0.750 & 0.898 & 0.515 \\ 
+Semi-trailer* & 25 & 25 & 0.714 & 0.880 & 0.903 & 0.756 \\ 
+\bottomrule
+\addlinespace
+\multicolumn{7}{l}{\small *Full class name: Semi-trailer / combination vehicle} \\
+\end{tabular}
+\end{table}
+
+The Precision-Recall (PR) curves for all evaluated classes are presented in \autoref{fig:BoxPR_curve} for both the YOLO26n (left) and YOLO26m (right) models. The area under each curve corresponds to the AP for that specific category, with the bold blue line representing the mAP$_{50}$ of 0.797 for YOLO26n and 0.866 for YOLO26m.
+
+The 'Car' class (orange line) displays a near-ideal trajectory in both models, maintaining high precision even as recall approaches 1.0, which accounts for its superior AP of 0.968 (YOLO26n) and 0.980 (YOLO26m). Other vehicle categories, such as 'Heavy Truck' and 'Semi-trailer', also demonstrate robust curves with large areas under their respective trajectories in both variants. In contrast, classes like 'Light Truck' and 'Bus' exhibit steeper declines in precision at higher recall levels, reflecting the challenges of identifying these categories in complex or occluded environments. Overall, the PR curves confirm that both models maintain a high level of precision across a majority of the recall spectrum, validating the mAP scores presented in Table \ref{tab:test_set_results_n} and \autoref{tab:test_set_results_m}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m/PR-curve.png}
+    \caption{Precision-Recall curve for all classes for both models. The area under each curve represents the average precision for a specific class.}
+    \label{fig:BoxPR_curve}
+\end{figure}
+
+The normalized confusion matrix for the test dataset is presented in \autoref{fig:conf_matrix_norm}. The strong diagonal values across most classes confirm the model's high classification accuracy, particularly for 'Car' (0.87) and 'Person' (0.83). However, the matrix reveals specific areas of inter-class confusion. For example, 25\% of 'Light Trucks' were misclassified as 'Heavy Trucks,' likely due to their similar visual geometries and overlapping size profiles.
+
+A notable finding in the confusion matrix is the 52\% false positive rate for the 'Car' class relative to the background. Upon qualitative review of the inference results, this is attributed to the labeling strategy employed during dataset preparation. Vehicles located at extreme distances or outside the primary 'Region of Interest' (RoI) were intentionally left unannotated to encourage the model to prioritize proximal traffic. However, the YOLO26n model demonstrated high sensitivity, successfully detecting these distant vehicles. Because these detections lacked corresponding ground-truth annotations, the evaluation metrics mathematically categorized them as false positives, effectively underreporting the model's true precision in these instances.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images//yolo_test/confusion_matrix_normalized.png}
+    \caption{Normalized Confusion Matrix.}
+    \label{fig:conf_matrix_norm}
+\end{figure}
+
+For a more comprehensive diagnostic overview of the model’s training and evaluation phases, additional performance plots are provided in Appendix \ref{app:raw_metrics}. These include the complete set of training and validation loss curves (Box and Classification losses), the non-normalized (count-based) confusion matrix, and the specific Precision-Confidence, Recall-Confidence, and F1-Confidence trajectories. These supplementary figures offer further insight into the model's convergence behavior and threshold-specific performance across all vehicle categories.
