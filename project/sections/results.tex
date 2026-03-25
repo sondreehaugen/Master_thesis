@@ -5,22 +5,22 @@
 This section presents the performance of the YOLO26n and YOLO26m model for vehicle detection and classification. For YOLO26n, the training process was conducted for 74 epochs, at which point early stopping was triggered as the validation loss reached a plateau. The YOLO26m was stopped at epoch 97. The following results are evaluated based on both the validation dataset used during training and an independent test set to ensure the model's generalizability to unseen data. The train/val/test split is identical for both models.
 
 \subsection{Training and Validation}
-The training progress of the YOLO26n and YOLO26m models, measured via mAP$_{50}$-95, is presented in \autoref{fig:metrics_mAP$_{50}$-95}. The curves for both variants exhibit a consistent upward trajectory, with initial fluctuations that gradually diminish as training progresses. After approximately epoch 55, the performance of both models plateaus, indicating that they have reached their respective learning capacities for the given dataset and architecture.
+The training progress of the YOLO26n and YOLO26m models, measured via mAP$_{50-95}$, is presented in \autoref{fig:metrics_mAP50-95}. The curves for both variants exhibit a consistent upward trajectory, with initial fluctuations that gradually diminish as training progresses. After approximately epoch 55, the performance of both models plateaus, indicating that they have reached their respective learning capacities for the given dataset and architecture.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m//comparison_metrics_mAP$_{50}$-95B.png}
-    \caption{Training progress comparison of YOLO26n and YOLO26m measured in mAP$_{50}$-95.}
-    \label{fig:metrics_mAP$_{50}$-95}
+    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m//comparison_metrics_mAP50-95B.png}
+    \caption{Training progress comparison of YOLO26n and YOLO26m measured in mAP$_{50-95}$.}
+    \label{fig:metrics_mAP50-95}
 \end{figure}
 
-Similarly, the mAP$_{50}$ progression (\autoref{fig:metrics_mAP$_{50}$}) follows a comparable learning curve, exhibiting a rapid performance increase within the initial 10-15 epochs. The model achieves a higher overall stability on this metric, peaking at approximately 0.77 for both models. The close alignment between the mAP$_{50}$ and mAP$_{50}$-95 trends further validates the model's reliability, showing that the improvements in detection accuracy were consistent across both strict and lenient IoU thresholds.
+Similarly, the mAP$_{50}$ progression (\autoref{fig:metrics_mAP50}) follows a comparable learning curve, exhibiting a rapid performance increase within the initial 10-15 epochs. The model achieves a higher overall stability on this metric, peaking at approximately 0.77 for both models. The close alignment between the mAP$_{50}$ and mAP$_{50-95}$ trends further validates the model's reliability, showing that the improvements in detection accuracy were consistent across both strict and lenient IoU thresholds.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m//comparison_metrics_mAP$_{50}$B.png}
-    \caption{Training progress comparison of YOLO26n and YOLO26m measured in mAP$_{50}$-95.}
-    \label{fig:metrics_mAP$_{50}$}
+    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m//comparison_metrics_mAP50B.png}
+    \caption{Training progress comparison of YOLO26n and YOLO26m measured in mAP50-95.}
+    \label{fig:metrics_mAP50}
 \end{figure}
 
 The Precision metric over the training duration for the YOLO26n and YOLO26m models is depicted in \autoref{fig:metrics_precision}. While both curves maintain a general upward trend, they exhibit higher volatility compared to the mAP metrics, with frequent fluctuations between epochs 10 and 50. Despite this variance, the YOLO26n model achieves a significant peak precision of approximately 0.83 around epoch 33, while the YOLO26m variant eventually stabilizes at higher values within the 0.75 to 0.80 range during the final phase of training.
@@ -45,7 +45,7 @@ The progression of the Recall metric for the YOLO26n and YOLO26m models is illus
 
 \subsection{Performance on Test Set}
 
-The final performance of both the YOLO26n and YOLO26m models was evaluated on the same independent test set of 151 images containing 585 object instances, as detailed in \autoref{tab:test_set_results_n} and Table \autoref{tab:test_set_results_m}. The YOLO26n model achieved an overall mAP$_{50}$ of 0.797 and an mAP$_{50}$-95 of 0.645, while the YOLO26m variant delivered noticeably stronger results with an mAP$_{50}$ of 0.866 and an mAP$_{50}$-95 of 0.696. In both cases, the test-set metrics slightly exceed the validation metrics recorded during training, indicating strong generalization capabilities and confirming that neither model is overfitted to the validation distribution.
+The final performance of both the YOLO26n and YOLO26m models was evaluated on the same independent test set of 151 images containing 585 object instances, as detailed in \autoref{tab:test_set_results_n} and Table \autoref{tab:test_set_results_m}. The YOLO26n model achieved an overall mAP50 of 0.797 and an mAP$_{50-95}$ of 0.645, while the YOLO26m variant delivered noticeably stronger results with an mAP50 of 0.866 and an mAP$_{50-95}$ of 0.696. In both cases, the test-set metrics slightly exceed the validation metrics recorded during training, indicating strong generalization capabilities and confirming that neither model is overfitted to the validation distribution.
 
 Analysis of individual classes shows that the ’Car’ category remains the most accurately detected for both models, with mAP$_{50}$ values of 0.968 (YOLO26n) and 0.980 (YOLO26m) and recall values above 0.96. Large vehicle categories such as ’Heavy Truck’ and ’Semi-trailer’ also demonstrated high reliability across both variants (mAP$_{50}$ of 0.874/0.861 and 0.841/0.903, respectively). While classes with fewer instances, such as ’Bus’ and ’Light Truck,’ exhibited comparatively lower precision, the overall consistency across diverse vehicle types, including the ’Person’ class (mAP$_{50}$ of 0.761 for YOLO26n and 0.898 for YOLO26m), confirms the effectiveness of both models in a variety of traffic scenarios.
 
@@ -55,7 +55,7 @@ Analysis of individual classes shows that the ’Car’ category remains the mos
 \label{tab:test_set_results_n}
 \begin{tabular}{lcccccc}
 \hline
-\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{R} & \textbf{mAP$_{50}$} & \textbf{mAP$_{50}$-95} \\ \hline
+\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{Recall} & \textbf{mAP50} & \textbf{mAP50-95} \\ \hline
 All Classes & 151 & 585 & 0.679 & 0.765 & 0.797 & 0.645 \\ \hline
 Bus         & 15  & 15  & 0.439 & 0.667 & 0.697 & 0.570 \\
 Car         & 131 & 474 & 0.813 & 0.960 & 0.968 & 0.785 \\
@@ -74,7 +74,7 @@ Semi-trailer* & 25 & 25 & 0.717 & 0.880 & 0.841 & 0.745 \\ \hline
 \label{tab:test_set_results_m}
 \begin{tabular}{lcccccc}
 \toprule
-\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{Recall} & \textbf{mAP$_{50}$} & \textbf{mAP$_{50}$-95} \\ 
+\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{Recall} & \textbf{mAP50} & \textbf{mAP50-95} \\ 
 \midrule
 \textbf{All} & 151 & 585 & 0.831 & 0.789 & 0.866 & 0.696 \\ 
 \midrule
