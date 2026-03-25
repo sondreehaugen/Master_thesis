@@ -349,7 +349,7 @@ While the AP measures the performance for single class, Mean Average Precision (
 mAP = \frac{1}{N} \sum_{i=1}^{N} AP_i
 \end{equation}
 
-The literature commonly reports two versions of mAP to provide a complete picture of model performance. The mAP$_{50}$ represents the mAP calculated at a fixed IoU treshold of 0.5. This means that a detection is labeled as a True Positive if the overlap between the predicted box and the GT box is minimum 50\%. Instead of using a single treshold, mAP$_{50}$-95 uses the average of mAP values calculated at ten different IoU tresholds from 0.5 to 0.95, in 0.05 increments. This metric rewards models for superior localization accuracy.
+The literature commonly reports two versions of mAP to provide a complete picture of model performance. The mAP$_{50}$ represents the mAP calculated at a fixed IoU treshold of 0.5. This means that a detection is labeled as a True Positive if the overlap between the predicted box and the GT box is minimum 50\%. Instead of using a single treshold, mAP$_{50-95}$ uses the average of mAP values calculated at ten different IoU tresholds from 0.5 to 0.95, in 0.05 increments. This metric rewards models for superior localization accuracy.
 
 \section{Literature Review and Research Gap}
 \label{sec:literature_review_research_gap}
