@@ -99,6 +99,56 @@ YOLO26x & 56.9 & 525.8 & 11.8 & 1.9 & 85 & 55.7 \\
 \end{tabular}
 \end{table}
 
+\section{Multi-Object Tracking}
+
+While object detection identifies and classifies vehicles in individual frames, multi-object tracking extends this capability by maintaining unique identities for each vehicle across consecutive frames. This is essential for applications such as traffic counting, trajectory analysis, and vehicle behavior monitoring at intersections.
+
+\subsection{Tracking Algorithm: BoT-SORT}
+
+The study implements the Bag-of-Tricks SORT (BoT-SORT) algorithm, which is the default tracker integrated with Ultralytics YOLO. BoT-SORT combines classical Hungarian algorithm-based data association with deep learning-based re-identification (ReID) features to maintain consistent track identities even when vehicles undergo temporary occlusions or leave and re-enter the field of view.
+
+The tracking process operates as follows:
+
+\begin{enumerate}
+    \item \textbf{Detection Association}: For each video frame, the detector outputs bounding boxes with associated class predictions and confidence scores. BoT-SORT matches these detections against active tracks using a combination of Intersection over Union (IoU) and appearance-based similarity metrics.
+    
+    \item \textbf{State Propagation}: Unmatched detections from the previous frame are propagated as tentative tracks, provided they exceed the initialization confidence threshold. This allows the tracker to maintain tracks for partially visible or temporarily occluded vehicles.
+    
+    \item \textbf{Track Management}: Tracks that remain unmatched for an extended duration (controlled by the track buffer parameter) are terminated. The track buffer provides a grace period to accommodate temporary occlusions while preventing the accumulation of "zombie" tracks.
+    
+    \item \textbf{Re-Identification}: ReID features enable BoT-SORT to re-identify vehicles that have been lost and subsequently re-detected, maintaining consistent identity across longer temporal gaps.
+\end{enumerate}
+
+\subsection{Gate-Based Origin-Destination Counting}
+
+To enable origin-destination (O-D) vehicle counting, the study implements a gate-zone-based methodology. Spatial regions (gates) are defined at distinct approaches of the intersection, corresponding to the cardinal directions: South (S), North (N), and East (E). Each vehicle is tracked through the scene, and the first stable gate that a vehicle enters is recorded as its origin. When the vehicle subsequently enters a different gate, that transition is recorded as an O-D pair, and the vehicle is classified according to its most frequently detected class over the tracking duration.
+
+\subsubsection{Tracking Point and Dwell Time}
+
+The tracking point for each vehicle is defined as the bottom-center of its bounding box. This choice is motivated by the fact that the lower portion of a vehicle is less susceptible to perspective distortion and occlusion artifacts, providing more robust positional information for gate assignment. A \textit{dwell time} threshold (minimum consecutive frames within a gate) is used to filter transient detections and ensure stable zone assignment. The default setting requires a vehicle to remain within a gate for at least two consecutive frames before the zone assignment is considered stable.
+
+\subsubsection{Classification of Tracked Vehicles}
+
+Rather than relying on the instantaneous class prediction for each frame, tracked vehicles are classified based on the aggregated class history across their tracking duration. For each track ID, a histogram of class predictions (weighted by detection confidence) is maintained. A class is considered \textit{stable} if it appears in at least five frames during the track's lifetime. If stable classes exist, the class with the highest mean confidence is selected. Otherwise, the class appearing most frequently is chosen. This temporal aggregation approach reduces classification noise from transient misclassifications.
+
+\subsection{Detection and Tracking Parameters}
+
+The detection and tracking pipeline is parameterized to balance precision and real-time processing constraints:
+
+\begin{itemize}
+    \item \textbf{Confidence Threshold ($\text{conf}_{\text{det}}$)}: Controls the minimum detection confidence required for a bounding box to be considered. Lower thresholds increase detection sensitivity but may introduce false positives.
+    
+    \item \textbf{IoU Threshold ($\text{IoU}_{\text{NMS}}$)}: Non-Maximum Suppression removes duplicate detections of the same object. The IoU threshold determines the overlap required before detections are considered duplicates.
+    
+    \item \textbf{Region of Interest (ROI) Margins}: To focus computational resources and reduce edge artifacts, tracking is performed only within an inner region of the frame. Horizontal and vertical margins are applied, typically retaining 90\% of frame width and 70–90\% of frame height.
+    
+    \item \textbf{Minimum Track Frames ($\text{min\_frames}_{\text{track}}$)}: Tracks must persist for a minimum number of frames to be considered valid. This parameter filters spurious detections and phantom tracks.
+\end{itemize}
+
+\subsection{Evaluation Protocol}
+
+The tracking system is evaluated by manually counting vehicle trajectories across origin-destination pairs and comparing these ground-truth counts against the automated tracker output. This validation is performed on representative segments of video to assess both overall accuracy and per-class accuracy, particularly focusing on specialized vehicle classes (light trucks, heavy trucks, semi-trailers) that are underrepresented in standard benchmark datasets.
+
 \section{Model Training}
 The model was trained in Google Colaboratory using an NVIDIA Tesla T4 GPU and Python 3.12.12. The detection architecture was implemented via the Ultralytics (v8.3.0) framework. Scikit-learn was used to handle the dataset partitioning, ensuring a randomized split between training and validation data.
 
