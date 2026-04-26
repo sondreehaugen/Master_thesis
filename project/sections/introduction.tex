@@ -1,4 +1,5 @@
 \chapter{Introduction}
+\label{chap:introduction}
 
 \section{Background for the choice of the topic}
 \label{sec:background}
@@ -12,29 +13,51 @@ and pedestrians interact within limited space, creating numerous
 potential conflict points.
 
 In current practice, traffic data at intersections is often collected using manual traffic counts. According to the Norwegian Public Roads Administration’s \textit{Traffic Data Guide}, manual registrations are typically conducted as short-term, periodic counts with a normal duration of 1-4 hours, often limited to peak periods \citep{SVV_V714}. Such counts are labour intensive and provide only a snapshot of traffic conditions, which makes it difficult to capture temporal variations across days, weeks, or seasons. This results in a gap between the data quality required for robust intersection design and the methods commonly used to obtain traffic data \citep{SVV_V714}. The handbook notes that intersection registrations remain an exception, as reliable automated methods for this application are not yet available \citep{SVV_V714}.
-% zero vision
-Norway's Zero Vision, anchored in the National Transport Plan in 2001, aims to eliminate all road traffic fatalities by 2050, with interim targets of maximum 350 fatalities and seriously injured by 2030, of which no more than 50 are fatalities \citep{regjeringen2024_meldst14}. With intersection accidents reaching their highest level since 2015, achieving these targets requires improved understanding of traffic patterns and more targeted safety interventions.
+
+Norway has pursued a systematic approach to reducing road traffic fatalities over several decades. In the 1970s, approximately 500 persons were killed annually; by 2024, this figure had declined to 87~\citep{trafikksikkerhetsutviklingen2024, regjeringen2024_meldst14}. This development is closely linked to Norway’s Zero Vision, anchored in the National Transport Plan in 2001, which aims to eliminate all road traffic fatalities by 2050, and includes interim targets for 2030 \citep{regjeringen2024_meldst14}. As shown in \autoref{fig:drept_hardt_skadde}, however, recent developments indicate that Norway is not on track to achieve these targets.
+
+Intersections account for a disproportionate share of road traffic casualties. Despite the overall reduction in fatalities and serious injuries since 2001, their share has not declined correspondingly~\citep{svv_trine}, indicating a continued need for targeted safety measures at these locations, as illustrated in \autoref{fig:prosentandel_kryss}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{project/images/fatalitiesandinjured.png}
+    \caption[Development in road traffic fatalities and serious injuries in Norway, with interim targets for 2030 and 2050]
+    {Development in road traffic fatalities and serious injuries in Norway, with interim targets for 2030 and 2050. Reproduced from \citep{trafikksikkerhetsutviklingen2024}}
+
+    \label{fig:drept_hardt_skadde}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{project//images/prosentandel_kryss.png}
+    \caption[Percentage of road traffic fatalities and serious injuries occurring at intersections (2001-2024)]
+    {Percentage of road traffic fatalities and serious injuries occurring at intersections (2001-2024). Based on data from TRINE \citep{svv_trine}.
+}
+    \label{fig:prosentandel_kryss}
+\end{figure}
+
+The societal costs associated with these accidents are substantial. Applying unit cost rates from the V712 \textit{Consequence Analysis} \citep{svv_v712_2025}, intersection accidents incurred approximately 4.1~billion NOK in societal costs in 2024 alone, with cumulative costs exceeding 128~billion NOK over the period 2001--2024. These estimates are based on a Value of a Statistical Life (VSL) of 46.7 million NOK (2023), while serious injuries carry an average cost of 16.8 million NOK \citep{svv_v712_2025}.
+Given the complex interactions between heavy vehicles and vulnerable road users in intersections, ensuring adequate design depends on high-quality traffic data capturing vehicle composition, turning movements, and temporal variation. These figures underscore the economic, in addition to the human, imperative for improved road safety at intersections.
 
 Today, 80\% of the Norwegian population lives in urban areas, and continued urbanization is a central premise of national transport policy \citep{regjeringen2024_meldst14, ssb_centralisation}. Norway’s zero-growth objective requires that all growth in urban passenger transport be absorbed by public transport, cycling, and walking \citep{regjeringen2024_meldst14}. This increases pressure on urban intersections, which must accommodate more vulnerable road users while maintaining safety. However, pedestrians and cyclists face five and ten times higher risk per kilometre than car occupants, respectively \citep{svv_tiltaksplan_trafikksikkerhet_2026_2029}.
 
-The economic implications are substantial: the Value of a Statistical Life (VSL) is estimated at 46.7 million NOK (2023), while serious injuries carry an average cost of 16.8 million NOK \citep{svv_v712_2025}. Given the complex interactions between heavy vehicles and vulnerable road users in intersections, ensuring adequate design and dimensioning depends on high-quality traffic data capturing vehicle composition, turning movements, and temporal variation.
-
 Norway's long-term transport policy, outlined in the National Transport Plan 2025–2036 (NTP) \citep{regjeringen2024_meldst14}, identifies digitalization and new technology as key enablers for achieving more efficient and sustainable transport systems. The NTP emphasizes exploiting existing transport data to manage and influence travel patterns, while prioritizing cost-effective measures across wider geographical areas. 
 
-AI-based methods are recognized as potential decision-support tools for applications such as intersection design, in line with the plan’s emphasis on data-driven and proactive traffic safety management. However, the extent to which such technologies can deliver traffic data of sufficient accuracy and reliability under real Norwegian operating conditions remains insufficiently explored. The following research gap section therefore identifies key areas requiring further investigation.
+AI-based methods are increasingly recognized as potential decision-support tools in transport applications, in line with the National Transport Plan’s emphasis on data-driven and proactive traffic safety management. However, the extent to which such technologies can deliver traffic data of sufficient accuracy and reliability under real operating conditions remains insufficiently explored. The following research gap section therefore identifies key areas requiring further investigation.
 
 \section{Knowledge Gap}
-Computer vision (CV) has become an increasingly important component of intelligent transportation systems (ITS). Comprehensive survey studies show that vision-based methods are applied across a wide range of transportation-related tasks and play a growing role in improving traffic monitoring, safety, and operational efficiency play a growing role in improving traffic monitoring, safety, and operational efficiency \cite{CVSurvey}.
+Computer vision (CV) has become an increasingly important component of intelligent transportation systems (ITS). Comprehensive survey studies show that vision-based methods are applied across a wide range of transportation-related tasks and play a growing role in improving traffic monitoring, safety, and operational efficiency \citep{CVSurvey}.
 
 Previous studies demonstrate that deep learning–based object detection models, particularly YOLO-based architectures, can achieve high accuracy and near real-time performance for vehicle detection and counting when evaluated on established benchmark datasets or in constrained traffic environments \citep{Everingham10,HuggingFacePascalVOC, Song2019VisionBasedVehicle, smartcities6050134, YOLO-PEL}. However, much of the existing literature formulates vehicle detection as a generic object detection problem, often using a limited number of vehicle classes and datasets consisting of still images or highway scenarios. Moreover, prior work rarely evaluates whether the extracted outputs correspond to traffic parameters required for intersection design, such as turning movements and vehicle composition, nor whether detection performance remains robust under real-world conditions including occlusions, dense traffic, and adverse lighting or weather. Consequently, there is limited empirical evidence on whether deep learning–based object detection applied to fixed roadside cameras can generate traffic data suitable for intersection design purposes.
 
 \section{Problem Statement and Research Questions}
-% HOW WE´LL APPROACH IT
-The objective of this thesis is to evaluate to what extent deep learning–based object detection applied to traffic camera data can provide traffic parameters of sufficient accuracy and reliability to serve as decision-support input for the design and dimensioning of road intersections in accordance with Norwegian design guidelines. Based on this problem statement, two research questions are sought to be answered in this thesis.
+\label{sec:rq}
+This thesis aims to evaluate how YOLO-based object detection and tracking systems can be designed and configured to extract accurate and reliable traffic parameters from video data at real-world intersections, and to what extent such systems can operate autonomously over time without manual intervention. Three research questions are sought to be answered in this thesis.
 
-\begin{itemize}
-    \item Which traffic parameters defined in N100 and V121 can be extracted from traffic camera data using deep learning–based object detection?
-    \item How accurately can deep learning–based object detection models estimate traffic volumes, vehicle composition, and turning movements compared to manual traffic counts?
+\begin{itemize}    
+    \item How accurately can YOLO-based detection models extract fine-grained vehicle classification at an intersection?
+    \item How do different model configurations (detector + tracker) perform in extracting turning movement counts under varying lighting conditions?
+    \item To what extent can a vision-based traffic monitoring system operate autonomously over time without manual intervention while maintaining reliable performance?
 \end{itemize}
 
 \section{Scope and limitations}
@@ -45,12 +68,11 @@ This study is delimited as follows:
 \begin{itemize}
     \item \textbf{Geographic:} Analysis of one urban intersection in Norway, representative of typical at-grade intersections in urban environments.
     
-   \item \textbf{Temporal:} Video data collected during February--March 2026, capturing variations across time of day, weather conditions, weekdays, and weekends.
+   \item \textbf{Temporal:} Video data collected during February--April 2026, capturing variations across time of day, weather conditions, weekdays, and weekends.
     
-    \item \textbf{Model scope:} Evaluation of multiple YOLO models (YOLOv8n, YOLOv8s, YOLOv8m) pre-trained on COCO dataset and fine-tuned for traffic object detection.
+    \item \textbf{Model scope:} Evaluation of two YOLO models and fine-tuned for traffic object detection.
 
-    
-    \item \textbf{Parameter:} Focus on traffic volumes, vehicle composition, turning movements, and presence of pedestrians/cyclists—key parameters for intersection design and safety assessment.
+    \item \textbf{Parameter:} Focus on traffic volumes, vehicle composition, turning movements, and presence of pedestrians.
 \end{itemize}
 
 \subsection*{Limitations}
@@ -62,7 +84,7 @@ The study has the following limitations:
 
     \item \textbf{Camera quality:} The positioning and image quality of the traffic camera may not be optimal for object detection. Certain areas in the video are blurred or obscured due to GDPR compliance requirements.
     
-    \item \textbf{Experimental focus:} The study demonstrates feasibility and validation against manual counts but does not address operational deployment, system integration, or GDPR compliance.
+   % \item \textbf{Experimental focus:} The study demonstrates feasibility and validation against manual counts but does not address operational deployment, system integration, or GDPR compliance.
     
     \item \textbf{Intersection type:} Limited to at-grade intersections; findings may not generalize to roundabouts, grade-separated interchanges, or rural intersections.
     
@@ -73,4 +95,4 @@ The study has the following limitations:
 \section{Structure of The Thesis}
 % HOW THE THESIS IS ORGANIZED
 
-The structure of this thesis is outlined as follows: Section~\ref{sec:background} provides the motivation and background for the research. Chapter~\ref{sec:theory} presents a comprehensive overview of traffic safety policy, object detection theory, and relevant literature. Chapter~\ref{sec:methods} details the data collection, YOLO model implementation, and evaluation methodology. Chapter~\ref{sec:results} presents the detection results and traffic metrics extracted from the intersection video. Chapter~\ref{sec:discussion} analyse the findings, assesses practical applicability for intersection design, and discusses limitations. Finally, Chapter~\ref{sec:conclusion} summarizes contributions and suggests directions for future work. The appendices contain detailed implementation code, raw detection results, and supplementary tables.
+The structure of this thesis is outlined as follows: Section~\ref{sec:background} provides the motivation and background for the research. Chapter~\ref{chap:theory} presents a comprehensive overview of traffic safety policy, object detection theory, and relevant literature. Chapter~\ref{chap:methods} details the data collection, YOLO model implementation, and evaluation methodology. Chapter~\ref{chap:results} presents the detection results and traffic metrics extracted from the intersection video. Chapter~\ref{chap:discussion} analyse the findings, assesses practical applicability for intersection design, and discusses limitations. Finally, Chapter~\ref{chap:conclusion} summarizes contributions and suggests directions for future work. The appendices contain detailed implementation code, raw detection results, and supplementary tables.

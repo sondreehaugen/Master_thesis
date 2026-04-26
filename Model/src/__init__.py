@@ -1,11 +1,8 @@
-from .config import AppConfig, TrackingConfig, build_paths
-from .od_counter import ODCounter
-from .tracker_runner import TrackingRunner
+from .GT import CLASS_ORDER, FLOW_ORDER, load_gt_persons, load_gt_vehicles
 
 __all__ = [
-    "AppConfig",
-    "TrackingConfig",
-    "build_paths",
-    "ODCounter",
-    "TrackingRunner",
+    "CLASS_ORDER",
+    "FLOW_ORDER",
+    "load_gt_persons",
+    "load_gt_vehicles",
 ]

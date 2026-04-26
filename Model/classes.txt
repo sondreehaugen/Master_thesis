@@ -1,8 +1,0 @@
-Buss
-Long combination vehicle
-Semi-trailer
-bicycle
-car
-motorcycle
-person
-truck

@@ -1,13 +1,26 @@
 \chapter{Methods}
-\label{sec:methods}
+\label{chap:methods}
+
+\section{Method overview}
+
+The overall technical workflow, shown in \autoref{fig:tech_workflow}, starts with collecting video streams from two traffic camera stations. Short 5 minute clips are saved at different times, followed by extraction of a diverse set of 1282 frames. These frames are semi-automatically annotated, an approach that is described in detail in \autoref{sec:data_annotation}. After the train/val/test split, YOLO26n and YOLO26m are fine-tuned and their weights are saved. 
+
+The two detectors are then combined with four different tracker configurations: ByteTrack and BotSort (applied to both daytime and nighttime footage), plus one custom BotSort variant optimized specifically for daytime conditions and another Custom BotSort variant optimized for nighttime conditions. This results in six model configurations per video type (day and night). All models are evaluated on the same manually annotated daytime and nighttime clips using a zone-based Origin-Destination strategy. Finally, metrics are gathered and compared, and the best-performing configuration is selected for more detailed reporting.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images/Tech_workflow.png}
+    \caption[Overall technical workflow of the custom vehicle detection and tracking pipeline]{Overall technical workflow of the custom vehicle detection and tracking pipeline developed in this thesis.}
+    \label{fig:tech_workflow}
+\end{figure}
 
 \section{Data Source}
 
-The Norwegian Public Roads Administration operates approximately 900 publicly accessible traffic camera stations across Norway. However, the majority of these stations provide only still images captured at ten-minute intervals and do not record continuous video streams. Among the limited number of stations that offer live video feeds, only a small subset is installed at intersections.
+The Norwegian Public Roads Administration operates approximately 900 publicly accessible traffic camera stations across Norway. However, the majority of these stations provide only still images captured at ten-minute intervals and do not record continuous video streams. Among the limited number of stations that offer live video feeds, only a small subset is situated in intersections.
 
-Two relevant camera stations were identified, with the first being mounted at Fv587 Haukeland, Bergen (Direction Arna), which is shown in \autoref{fig:haukeland_bilde}. The intersection is an unsignalised T-junction, where a secondary road connects to the main road. Marked pedestrian crossings are present across the main approaches, and a bus bay with a sheltered stop is located along the roadside. The area around the intersection includes a small number of residential buildings, open land, and roadside vegetation.
+Two relevant camera stations were identified, with the first being mounted at Fv587 Haukeland, Bergen (Direction Arna), which is shown in \autoref{fig:haukeland_bilde}. The intersection is an unsignalised T-junction, where a secondary road connects to the main road. Marked pedestrian crossings are present across the main approaches, and a bus bay with a sheltered stop is located along both of the roadsides. The area around the intersection includes a small number of residential buildings, open land, and roadside vegetation.
 
-The second relevant camera station is mounted at Rv36 Kjørbekk (direction Porsgrunn), which is shown in \autoref{fig:kjørbekk_bilde}. The intersection is also an unsignalised T-junction where a secondary road connects to the main road. Towards the top of the frame, the main road leads into a roundabout that facilitates traffic distribution in various directions. A dedicated, snow-covered pedestrian and bicycle path runs parallel to the main road on the right side. Near the T-junction, an underground pedestrian crossing allows individuals to safely cross beneath the main road. Additionally, a bus stop equipped is located along the roadside on the left.
+The second relevant camera station is mounted at Rv36 Kjørbekk (direction Porsgrunn), which is shown in \autoref{fig:kjørbekk_bilde}. The intersection is also an unsignalised T-junction where a secondary road connects to the main road. Towards the top of the frame, the main road leads into a roundabout that facilitates traffic distribution in various directions. A dedicated, pedestrian and bicycle path runs parallel to the main road on the right side. Near the T-junction, an underground pedestrian crossing allows individuals to safely cross beneath the main road. Additionally, a bus stop is located along the roadside on the left.
 
 \begin{figure}[H]
     \centering
@@ -27,25 +40,27 @@ The second relevant camera station is mounted at Rv36 Kjørbekk (direction Porsg
 
 The video data was captured from the SVV live streams using an FFmpeg script targeting the m3u8-stream URLs. To manage the data efficiently, the continuous streams were segmented into five-minute MPEG-4 video clips. Rather than using the entire raw video duration, a strategic sampling approach was implemented to maximize the quality and relevance of the dataset.
 
-Initially, frames were extracted at random intervals to establish a baseline. However, as the base YOLOv8 model is pre-trained on the COCO dataset, it already possessed high proficiency in identifying standard passenger cars. To focus the training on specialized vehicle classes, the strategy shifted toward manual frame extraction, specifically targeting intervals containing heavy vehicles.
+Initially, frames were extracted at random intervals to establish a baseline. However, as the base YOLO26 model is pre-trained on the COCO dataset, it already possessed high proficiency in identifying standard passenger cars. To focus the training on specialized vehicle classes, the strategy shifted toward manual frame extraction, specifically targeting intervals containing heavy vehicles.
 
 As the custom model’s weights were updated and its performance improved, a more automated model-in-the-loop approach was introduced. A custom script was developed to process the video segments, running the current YOLO weights on every frame and automatically extracting only those images where the model detected heavy vehicles. This filtering process significantly reduced the redundancy of the dataset, ensuring that the manual annotation effort was concentrated on the most informative samples for the model's specific objectives.
 
 
 \section{Data Quality}
 
-The video data varies in resolution and frame rates between the two recording sites. The stream from Fv587 Haukeland is captured at a resolution of 800 × 450 pixels with a frame rate of approximately 10 FPS. In contrast, the Rv36 Kjørbekk station provides a higher spatial resolution of 1024 × 576 pixels, but at a lower frame rate of roughly 5 FPS. To ensure the model's robustness and ability to generalize, the dataset was extracted at various times of the day, encompassing a wide range of weather conditions, from clear daylight to dark, foggy, and snowy environments, as illustrated in \autoref{fig:weather_conditions}. This diversity in the training data is crucial for the model to accurately identify vehicles despite shifting shadows, varying light intensity, and reduced visibility due to precipitation.
+The video data varies in resolution and frame rates between the two recording sites. The stream from Fv587 Haukeland is captured at a resolution of 800 × 450 pixels. During the data collection period, this stream was delivered at approximately 10 FPS (7 FPS at night) and contained a large grey censoring box in the upper right corner. As of April 13$^{th}$ 2026, the grey box has been removed, the frame rate has been doubled, and the field of view has been slightly zoomed out. In contrast, the Rv36 Kjørbekk station provides a higher spatial resolution of 1024 × 576 pixels, but at a lower frame rate of roughly 5 FPS. To ensure the model's robustness and ability to generalize, the dataset was extracted at various times of the day, encompassing a wide range of weather conditions, from clear daylight to dark, foggy, and snowy environments, as illustrated in \autoref{fig:weather_conditions}. This diversity in the training data is crucial for the model to accurately identify vehicles despite shifting shadows, varying light intensity, and reduced visibility due to precipitation.
 
-\begin{figure}
+In addition, the public SVV streams include automatic privacy masking, where faces and license plates, sometimes the entire vehicle, are blurred/pixelated. This introduces image artifacts and removes fine-grained texture information, which can reduce classification reliability for visually similar vehicle categories and degrade appearance-based re-identification performance in multi-object tracking.
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{project//images/weather_conditions.png}
+    \includegraphics[width=1\linewidth]{project/images/weather_conditions.png}
     \caption[Examples of environmental and lighting variations in the dataset.]{Examples of environmental and lighting variations in the dataset. From left to right: clear daylight with high contrast, twilight with fog and reduced visibility, and nighttime conditions relying on artificial road lighting. Source: \cite{SVV_HaukelandKamera}}
     \label{fig:weather_conditions}
 \end{figure}
 
 \section{Data Limitations}
 
-The data acquisition process was subject to several constraints that shaped the final composition of the dataset. Since SVV does not provide access to historical video archives, the study relied exclusively on live-stream captures. This prevented the retrieval of data from different seasons or specific past traffic events, effectively tying the dataset to the environmental conditions present during the recording period. Consequently, because the recordings were conducted during the Norwegian winter, the dataset reflects a notable scarcity of pedestrians, cyclists, and motorcyclists. Furthermore, the relatively low traffic volume at the selected sites necessitated extended recording periods to ensure a sufficient number of observations for the less frequent vehicle classes.
+The data acquisition process was subject to several constraints that shaped the final composition of the dataset. Since SVV does not provide access to historical video archives, the study relied exclusively on live-stream captures. This prevented the retrieval of data from different seasons or specific past traffic events, effectively tying the dataset to the environmental conditions present during the recording period. Consequently, because the recordings were conducted during the Norwegian winter/early spring, the dataset reflects a notable scarcity of pedestrians, cyclists, and motorcyclists. Furthermore, the relatively low traffic volume at the selected sites necessitated extended recording periods to ensure a sufficient number of observations for the less frequent vehicle classes.
 
 A significant technical limitation is the automated privacy masking implemented by SVV on their public live streams. To comply with privacy regulations, the system is designed to blur or pixelate license plates and faces. However, in many instances, particularly at the Rv36 Kjørbekk station, this automated censorship is overly aggressive, occasionally causing the entire vehicle to become heavily pixelated. This loss of visual data poses a challenge for both manual annotation and model training, as critical identifying features of specialized vehicle classes may be obscured.
 
@@ -53,31 +68,48 @@ This technical challenge is further compounded by the subjective nature of manua
 
 
 \section{Data Annotation}
+\label{sec:data_annotation}
+To address the research gap identified in Section~\ref{sec:research_gap}, where most existing automatic vehicle detection studies are limited to a small number of standard vehicle classes and fail to capture the full diversity of real-world road users \citep{Maity2022LastDecadeVehicleDetection}, the development of the custom object detection model follows an iterative, semi-automated annotation pipeline specifically designed to incorporate a broader and more granular set of vehicle classes.
 
-The development of the custom object detection model follows an iterative, semi-automated annotation pipeline designed to optimize labeling efficiency for specialized vehicle classes. As shown in the \autoref{fig:annotation_workflow}, the process begins by defining the target vehicle classes, followed by an initial pre-annotation phase. To ensure a consistent and reproducible labeling environment, Label Studio was deployed using Docker, allowing for seamless integration of the annotation interface with custom backend scripts. A subset of images is initially processed using a base YOLOv8 model to generate preliminary labels. These are then manually reviewed within Label Studio to correct misclassifications and incorporate "non-COCO" classes, such as \textit{light truck (LL), heavy truck (L), and semi-trailer / combination vehicle (VT)}. Once a high-quality initial dataset is established, it is used to train a custom model. This trained model is subsequently deployed to pre-annotate new image batches, after which human annotators perform final manual corrections. This "human-in-the-loop" approach ensures high ground-truth accuracy while significantly reducing the time required to expand the dataset.
+As shown in \autoref{fig:annotation_workflow}, the process begins by defining the target vehicle classes, followed by an initial pre-annotation phase. To ensure a consistent and reproducible labeling environment, Label Studio was deployed using Docker, allowing for seamless integration of the annotation interface with custom backend scripts. A subset of images is initially processed using a base YOLOv8 model to generate preliminary labels. These are then manually reviewed within Label Studio to adjust bounding boxes, correct misclassifications, and incorporate ``non-COCO'' classes, such as \textit{light truck (LL)}, \textit{heavy truck (L)}, and \textit{semi-trailer / combination vehicle (VT)}. Once a high-quality initial dataset is established, it is used to train a custom model. This trained model is subsequently deployed to pre-annotate new image batches, after which human annotators perform final manual corrections. This approach ensures high ground-truth accuracy while significantly reducing the time required to expand the dataset.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.15\linewidth]{project//images/data.drawio.png}
-    \caption{Annotation Workflow.}
+    \includegraphics[width=1\linewidth]{project/images/annotation_workflow.png}
+    \caption{Annotation workflow diagram.}
     \label{fig:annotation_workflow}
 \end{figure}
 
-\section{Choice of Base Model: YOLO26}
-
-YOLO26 was selected for vehicle detection and classification in this study because it is the most recent Ultralytics YOLO model. Its architectural details and initial benchmarks were first detailed in a September 2025 preprint \citep{sapkota2026yolo26keyarchitecturalenhancements}, with the full public release of models occurring in January 2026. Regarding its distribution, the model is provided under a dual-licensing scheme: it is available under the open-source AGPL-3.0 license for researchers and open-source projects, while an Enterprise License is required for proprietary commercial applications \citep{Ultralytics2024}.
-
-A primary advancement in this version is the fully end-to-end, Non-Maximum Suppression (NMS)-free inference pipeline. By eliminating the traditional post-processing bottleneck required to remove duplicate bounding boxes, YOLO26 achieves a significant leap in computational efficiency. Benchmarks indicate that this NMS-free architecture, combined with a more hardware-friendly bounding box regression that removes Distribution Focal Loss (DFL), results in up to a 43\% reduction in CPU inference latency compared to previous iterations. This makes the model uniquely suited for real-time deployment without necessitating expensive GPU acceleration.
-
-Furthermore, the integration of Progressive Loss Balancing (ProgLoss) ensures more stable training by dynamically adjusting loss component weighting, preventing the model from being dominated by "easy" examples. This is complemented by Small-Target-Aware Label Assignment (STAL), which specifically improves the detection of small, distant, or occluded vehicles, a frequent challenge in the traffic camera feeds used in this study. Finally, the introduction of the MuSGD optimizer provides faster convergence and greater stability, making the model more practical for fine-tuning on custom vehicle datasets with reduced sensitivity to hyperparameter selection.
-
-\subsection{Selection of Model Variants}
-Based on the performance metrics summarized in \autoref{tab:yolo26-sizes}, this study evaluates two specific versions of the YOLO26 architecture to address the trade-off between computational efficiency and detection precision.
+\subsection*{Annotation Rules and Class Definitions}
+To ensure consistency and reduce ambiguity, vehicles were categorized based on physical characteristics and axle counts. Objects at extreme distances or those with insufficient visibility were excluded from the dataset to prevent the model from learning from ambiguous features. \autoref{fig:classes} visualizes the classes that are described below.
 
 \begin{itemize}
-   \item \textbf{YOLO26n (Nano):} Selected for its high efficiency and operational reliability on CPU-based systems. While the YOLO26s (Small) variant technically meets the 10 FPS requirement at approximately 11 FPS, it offers a negligible performance margin. YOLO26n, achieving 26 FPS on a standard CPU (ONNX), provides a significant "safety buffer." This overhead is critical to account for the additional computational costs of the object tracking algorithms and to ensure stable real-time processing without frame-dropping during periods of high traffic density or system fluctuations.
-    
-    \item \textbf{YOLO26m (Medium):} Selected as the high-performance benchmark for this study. While the "Extra Large" (x) variant offers higher theoretical accuracy, it was excluded due to its prohibitive hardware requirements. Training the YOLO26x model requires significantly more VRAM than the 15GB available on the standard Google Colab Tesla T4 GPU, leading to memory allocation errors. Furthermore, the estimated training time for the "x" variant would extend to several hours per session, whereas the Medium variant achieves a superior balance of accuracy (53.1 mAP$_{50-95}$) and computational feasibility for this research.
+    \item \textbf{Car}: Includes all standard passenger vehicles, including sedans, SUVs, and commercial vans.
+    \item \textbf{Bus}: Includes public transit buses and other buses.
+    \item \textbf{Light Truck}: Two-axle commercial vehicles and delivery trucks. This category also includes passenger cars towing small trailers, as their total length and weight profiles are more consistent with light freight vehicles. Tractors and camping vans are also included.
+    \item \textbf{Heavy Truck}: Rigid trucks with three axles. This also includes semi-trailer tractor units (bobtails) travelling without a trailer.
+    \item \textbf{Semi-trailer / Combination Vehicle}: Includes all articulated vehicles with four or more axles.
+    \item \textbf{Motorcycle}: Includes both high-capacity motorcycles and small-engine scooters.
+    \item \textbf{Bicycle}: Includes all human-powered or electric bicycles.
+    \item \textbf{Person}: Includes individual pedestrians and stationary persons within the traffic environment.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images/classes.png}
+    \caption{Visualization of the 8 classes in the dataset.}
+    \label{fig:classes}
+\end{figure}
+
+
+\subsection{Model Selection}
+
+Following the theoretical evaluation of modern object detection architectures in \autoref{sec:computer_vision}, YOLO26 was selected as the core framework for this study. Based on the performance metrics summarized in \autoref{tab:yolo26-sizes}, this study evaluates two specific versions of the YOLO26 architecture to address the trade-off between computational efficiency and detection precision.
+
+\begin{itemize}
+   \item \textbf{YOLO26n (Nano):} Selected for its high CPU efficiency, achieving 26\,FPS (ONNX) on standard hardware. This provides a comfortable safety margin above the required 10\,FPS, allowing stable real-time operation when combined with object tracking under varying traffic conditions.
+
+   \item \textbf{YOLO26m (Medium):} Chosen as the high-performance benchmark. The extra-large (x) variant was excluded due to excessive VRAM demands (exceeding the 15\,GB available on Colab T4) and significantly longer training times. The medium variant offers a good balance between accuracy and computational feasibility.
 \end{itemize}
 
 \begin{table}[H]
@@ -99,62 +131,165 @@ YOLO26x & 56.9 & 525.8 & 11.8 & 1.9 & 85 & 55.7 \\
 \end{tabular}
 \end{table}
 
-\section{Multi-Object Tracking}
-
-While object detection identifies and classifies vehicles in individual frames, multi-object tracking extends this capability by maintaining unique identities for each vehicle across consecutive frames. This is essential for applications such as traffic counting, trajectory analysis, and vehicle behavior monitoring at intersections.
-
-\subsection{Tracking Algorithm: BoT-SORT}
-
-The study implements the Bag-of-Tricks SORT (BoT-SORT) algorithm, which is the default tracker integrated with Ultralytics YOLO. BoT-SORT combines classical Hungarian algorithm-based data association with deep learning-based re-identification (ReID) features to maintain consistent track identities even when vehicles undergo temporary occlusions or leave and re-enter the field of view.
-
-The tracking process operates as follows:
-
-\begin{enumerate}
-    \item \textbf{Detection Association}: For each video frame, the detector outputs bounding boxes with associated class predictions and confidence scores. BoT-SORT matches these detections against active tracks using a combination of Intersection over Union (IoU) and appearance-based similarity metrics.
-    
-    \item \textbf{State Propagation}: Unmatched detections from the previous frame are propagated as tentative tracks, provided they exceed the initialization confidence threshold. This allows the tracker to maintain tracks for partially visible or temporarily occluded vehicles.
-    
-    \item \textbf{Track Management}: Tracks that remain unmatched for an extended duration (controlled by the track buffer parameter) are terminated. The track buffer provides a grace period to accommodate temporary occlusions while preventing the accumulation of "zombie" tracks.
-    
-    \item \textbf{Re-Identification}: ReID features enable BoT-SORT to re-identify vehicles that have been lost and subsequently re-detected, maintaining consistent identity across longer temporal gaps.
-\end{enumerate}
-
-\subsection{Gate-Based Origin-Destination Counting}
-
-To enable origin-destination (O-D) vehicle counting, the study implements a gate-zone-based methodology. Spatial regions (gates) are defined at distinct approaches of the intersection, corresponding to the cardinal directions: South (S), North (N), and East (E). Each vehicle is tracked through the scene, and the first stable gate that a vehicle enters is recorded as its origin. When the vehicle subsequently enters a different gate, that transition is recorded as an O-D pair, and the vehicle is classified according to its most frequently detected class over the tracking duration.
-
-\subsubsection{Tracking Point and Dwell Time}
-
-The tracking point for each vehicle is defined as the bottom-center of its bounding box. This choice is motivated by the fact that the lower portion of a vehicle is less susceptible to perspective distortion and occlusion artifacts, providing more robust positional information for gate assignment. A \textit{dwell time} threshold (minimum consecutive frames within a gate) is used to filter transient detections and ensure stable zone assignment. The default setting requires a vehicle to remain within a gate for at least two consecutive frames before the zone assignment is considered stable.
-
-\subsubsection{Classification of Tracked Vehicles}
-
-Rather than relying on the instantaneous class prediction for each frame, tracked vehicles are classified based on the aggregated class history across their tracking duration. For each track ID, a histogram of class predictions (weighted by detection confidence) is maintained. A class is considered \textit{stable} if it appears in at least five frames during the track's lifetime. If stable classes exist, the class with the highest mean confidence is selected. Otherwise, the class appearing most frequently is chosen. This temporal aggregation approach reduces classification noise from transient misclassifications.
-
-\subsection{Detection and Tracking Parameters}
-
-The detection and tracking pipeline is parameterized to balance precision and real-time processing constraints:
-
-\begin{itemize}
-    \item \textbf{Confidence Threshold ($\text{conf}_{\text{det}}$)}: Controls the minimum detection confidence required for a bounding box to be considered. Lower thresholds increase detection sensitivity but may introduce false positives.
-    
-    \item \textbf{IoU Threshold ($\text{IoU}_{\text{NMS}}$)}: Non-Maximum Suppression removes duplicate detections of the same object. The IoU threshold determines the overlap required before detections are considered duplicates.
-    
-    \item \textbf{Region of Interest (ROI) Margins}: To focus computational resources and reduce edge artifacts, tracking is performed only within an inner region of the frame. Horizontal and vertical margins are applied, typically retaining 90\% of frame width and 70–90\% of frame height.
-    
-    \item \textbf{Minimum Track Frames ($\text{min\_frames}_{\text{track}}$)}: Tracks must persist for a minimum number of frames to be considered valid. This parameter filters spurious detections and phantom tracks.
-\end{itemize}
-
-\subsection{Evaluation Protocol}
-
-The tracking system is evaluated by manually counting vehicle trajectories across origin-destination pairs and comparing these ground-truth counts against the automated tracker output. This validation is performed on representative segments of video to assess both overall accuracy and per-class accuracy, particularly focusing on specialized vehicle classes (light trucks, heavy trucks, semi-trailers) that are underrepresented in standard benchmark datasets.
-
-\section{Model Training}
-The model was trained in Google Colaboratory using an NVIDIA Tesla T4 GPU and Python 3.12.12. The detection architecture was implemented via the Ultralytics (v8.3.0) framework. Scikit-learn was used to handle the dataset partitioning, ensuring a randomized split between training and validation data.
+\section{Model Training/ Fine Tuning}
+The selected YOLO26n and YOLO26m models were fine-tuned in Google Colaboratory using an NVIDIA Tesla T4 GPU and Python 3.12.12. The detection architecture was implemented via the Ultralytics (v8.3.0) framework. Scikit-learn was used to handle the dataset partitioning, ensuring a randomized split between training and validation data.
 
 \subsection*{Training Configuration and Hyperparameters}
-The model was trained for 100 epochs using an input image size of 640 pixels and a batch size of 16. To optimize training efficiency and prevent overfitting, an early-stopping patience of 20 epochs was implemented, which terminates the process if no improvement is detected in the validation metrics. All experiments were conducted with a fixed seed of 42 to ensure the reproducibility of the weight initializations and stochastic gradients.
+Each model was trained for 100 epochs using an input image size of 640 pixels and a batch size of 16. To optimize training efficiency and prevent overfitting, an early-stopping patience of 20 epochs was implemented, which terminates the process if no improvement is detected in the validation metrics. All experiments were conducted with a fixed seed of 42 to ensure the reproducibility of the weight initializations and stochastic gradients.
 
-The training of the model was conducted using the default hyperparameter configurations provided by the YOLO26 framework. Traditionally, achieving optimal performance in object detection requires iterative "tuning sessions," where the model is retrained multiple times to find the best combination of variables. In this study, no manual hyperparameter tuning was performed, as this process is both time-consuming and computationally expensive, particularly under the resource constraints of a Google Colab Tesla T4 GPU environment.
+The training of the model was conducted using the default hyperparameter configurations provided by the YOLO26 framework (Appendix~\ref{app:hyperparameters}). Traditionally, achieving optimal performance in object detection requires iterative "tuning sessions," where the model is retrained multiple times to find the best combination of variables. In this study, no manual hyperparameter tuning was performed, as this process is both time-consuming and computationally expensive, particularly under the resource constraints of a Google Colab Tesla T4 GPU environment.
 
 Additionally, the architectural advancements in YOLO26 significantly mitigate the necessity for such extensive tuning. By utilizing an NMS-free design, the requirement to manually optimize IoU and confidence thresholds is entirely removed. Furthermore, the implementation of the MuSGD optimizer provides a more robust and stable learning process than the SGD or AdamW optimizers used in models ranging from YOLOv8 to YOLOv11, which required extensive hyperparameter tuning \citep{sapkota2026yolo26keyarchitecturalenhancements}.
+
+\section{Vehicle Tracking and Origin--Destination Estimation}
+\label{subsec:method_tracking_od}
+
+After fine-tuning YOLO26 on the SVV intersection dataset, the resulting custom-trained YOLO26n and YOLO26m models are used as the detection backbone in the full video-processing pipeline. While object detection provides per-frame bounding boxes and vehicle class predictions, the extraction of traffic engineering parameters such as turning movements requires consistent vehicle identities over time. Therefore, multi-object tracking is applied to associate detections across consecutive frames and reconstruct vehicle trajectories through the intersection.
+
+Building on these trajectories, an origin--destination (O--D) estimation procedure is implemented to assign each tracked vehicle an entry approach (origin) and an exit approach (destination) based on predefined spatial gate regions. This enables automated estimation of turning movements and directional traffic volumes, which are later compared against manual ground-truth counts for validation.
+
+\subsubsection{Tracking Algorithm}
+\label{subsubsec:method_tracker}
+
+Multi-object tracking is performed using the tracking algorithms available in the Ultralytics YOLO framework. The comparison includes three different trackers: ByteTrack, BoT-SORT and two custom BoT-SORTs, one for daylight and nighttime.
+
+All trackers are applied in track mode with persistent identities enabled, allowing each detected vehicle to be assigned a consistent track ID across frames. ByteTrack is used as a lightweight baseline tracker, while BoT-SORT is employed for its ability to incorporate appearance-based re-identification.
+
+In addition to the default implementations, a custom BoT-SORT configuration is used to improve tracking robustness in traffic scenarios. For daytime experiments, this is implemented in \textit{day\_botsort.yaml}. For night-time experiments, a dedicated configuration file \textit{night\_botsort.yaml} is used to better handle low-light conditions and headlight-induced artifacts. 
+
+Table~\ref{tab:botsort-config} summarizes the parameters used in both configurations. The night-time profile uses lower detection thresholds to increase sensitivity under degraded visibility, and a larger track buffer to retain tracks longer during missed detections. The match threshold is set slightly higher at night to enforce stricter association and reduce erroneous ID switches caused by unreliable detections. Appearance-based ReID is enabled in the daytime configuration to leverage visual features for robust re-association, but disabled at night, where low-light conditions and headlight glare render appearance cues unreliable.
+
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{8pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}lcc@{}}
+\textbf{Parameter} & \textbf{Day BoT-SORT} & \textbf{Night BoT-SORT} \\
+\midrule
+\texttt{track\_high\_thresh}  & 0.25             & 0.20 \\
+\texttt{track\_low\_thresh}   & 0.10             & 0.08 \\
+\texttt{new\_track\_thresh}   & 0.35             & 0.22 \\
+\texttt{track\_buffer}        & 30               & 45 \\
+\texttt{match\_thresh}        & 0.75             & 0.82 \\
+\texttt{fuse\_score}          & True             & True \\
+\texttt{gmc\_method}          & \texttt{none}    & \texttt{none} \\
+\texttt{proximity\_thresh}    & 0.50             & 0.50 \\
+\texttt{appearance\_thresh}   & 0.25             & 0.25 \\
+\texttt{with\_reid}           & True             & False \\
+\texttt{model}                & \texttt{auto}    & \texttt{auto} \\
+\bottomrule
+\end{tabular}
+\caption[Custom BoT-SORT configuration parameters]{Comparison of custom BoT-SORT configurations used in daytime and night-time experiments.}
+\label{tab:botsort-config}
+\end{table}
+
+Detection-to-track association is controlled through the confidence and IoU thresholds in the YOLO tracking pipeline. These parameters are tuned to balance detection sensitivity and tracking stability. The different tracker configurations are evaluated against ground-truth origin--destination counts, and the best-performing setup is selected for further analysis.
+
+\subsubsection{Gate-Zone Definition and Calibration}
+\label{subsubsec:method_zones}
+
+To enable O--D estimation, spatial gate zones are manually defined as polygons in image coordinates $(x,y)$, where $x$ increases to the right and $y$ increases downwards. Each polygon corresponds to a directional entry or exit (e.g., North, South, East).
+
+The zones are intentionally drawn slightly larger than the visible roadway to increase robustness against detection noise, small localization errors, and partial occlusions. A visualization step overlays the polygons on a reference frame together with a coordinate grid, allowing efficient and precise placement of polygon vertices. This facilitates manual calibration of the zones by making it easier to read off coordinates directly from the image.
+
+An example of the defined gate zones and the coordinate grid used during calibration is shown in Figure~\ref{fig:Gatezones}. Each zone is assigned a semantic label, which is used directly in the O--D computation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\linewidth]{project/images/Gatezones.png}
+    \caption{Visualization of manually defined gate zones overlaid on a reference frame, including a coordinate grid used for calibration.}
+    \label{fig:Gatezones}
+\end{figure}
+
+\subsubsection{Tracking Pipeline}
+\label{subsubsec:method_pipeline}
+
+The full processing pipeline is implemented in the function \texttt{run\_video}, which converts raw video into O--D outputs through the following steps:
+
+\paragraph{Video processing and ROI selection.}
+The input video is read using OpenCV, and metadata such as resolution, frame rate, and total frames are extracted. To reduce computational cost and avoid edge artifacts, tracking is performed only within a central region of interest (ROI), defined by horizontal and vertical ratios $(r_w, r_h)$. 
+
+In addition, restricting the analysis to the central region improves classification reliability, as objects near the image boundaries are more prone to partial visibility, perspective distortion, and truncated bounding boxes, which can negatively affect both detection and classification performance.
+\[
+x_0=\left\lfloor\frac{(1-r_w)W}{2}\right\rfloor,\quad x_1=W-x_0,\quad
+y_0=\left\lfloor\frac{(1-r_h)H}{2}\right\rfloor,\quad y_1=H-y_0.
+\]
+Each frame is cropped to this ROI prior to inference, while the ROI boundary is visualized in the output video.
+
+\subsubsection{Night-Time Preprocessing}
+\label{subsubsec:method_night}
+
+To improve robustness under low-light conditions, a dedicated night-time mode is applied to the region of interest (ROI). Night-time footage often contains strong glare from vehicle headlights, leading to overexposed regions and reduced contrast.
+
+To mitigate this, Contrast Limited Adaptive Histogram Equalization (CLAHE) is applied to the luminance channel in LAB color space. In addition, glare suppression is applied to very bright pixels before detection. Together, these steps enhance local contrast while preventing excessive amplification of noise. The preprocessing is applied prior to detection and tracking.
+
+This step is enabled conditionally and is primarily used for night-time scenarios where standard detection performance degrades. In the night-time experiment setup, tracking hyperparameters are also adjusted (e.g., detection confidence threshold, minimum track length, and zone dwell constraint) to reduce unstable short tracks and boundary flicker.
+
+\paragraph{Detection and tracking.}
+A YOLO-based detector is executed in tracking mode with persistent identities. The tracker assigns a unique ID to each vehicle and maintains this identity across frames, enabling trajectory reconstruction and temporal analysis.
+
+\paragraph{Tracking point representation.}
+Each detected bounding box $(x_1,y_1,x_2,y_2)$ is reduced to a single representative point. Two alternatives are supported: the centroid and the bottom-center point. The bottom-center point,
+\[
+\left(\frac{x_1+x_2}{2},\,y_2-\delta\right),
+\]
+is used by default, as it better approximates the vehicle's position on the road plane and is less sensitive to perspective distortion.
+
+\paragraph{Zone membership}
+A vehicle is considered inside a gate zone if its tracking point lies within the corresponding polygon. This is evaluated using a standard point-in-polygon test.
+
+\subsubsection{Zone Stabilization and O--D Logic}
+\label{subsubsec:method_od_logic}
+
+To avoid spurious transitions caused by detection noise near zone boundaries, zone assignments are stabilized using a dwell-time constraint. For each track $i$, a short history buffer of recent zone assignments is maintained:
+\[
+H_t(i) = [z_{t-K+1}(i), \ldots, z_t(i)],
+\]
+where $z_t(i)$ denotes the zone at frame $t$. A stable zone is declared if the last $K$ non-null entries are identical. In this study, $K=2$ is used as a compromise between responsiveness and robustness.
+
+The O--D logic is defined as follows:
+\begin{itemize}
+    \item The first stable zone observed for a track defines its origin $o(i)$.
+    \item The next distinct stable zone defines its destination $d(i)$.
+    \item Each track contributes at most one O--D event $o(i) \rightarrow d(i)$.
+\end{itemize}
+
+This ensures that each vehicle is counted once, preventing overcounting due to oscillations or prolonged presence in a zone.
+
+\subsubsection{Track-Level Class Stabilization}
+\label{subsubsec:method_class_stabilization}
+
+To obtain robust vehicle classification, class predictions are aggregated over the lifetime of each track. For each track ID, both the predicted classes and their associated confidence scores are stored across frames.
+
+For each class, the number of occurrences and the average confidence are computed. A class is considered stable if it appears in at least five frames. If one or more stable classes exist, the class with the highest average confidence is selected. Otherwise, the class that appears most frequently is chosen.
+
+This approach reduces the impact of occasional misclassifications and provides more consistent class labels for O--D analysis.
+
+\subsubsection{O--D Matrix Construction}
+\label{subsubsec:method_od_matrix}
+
+O--D counts are aggregated by destination $d$, origin $o$, and vehicle class $c$:
+\[
+M_{d,o,c} \leftarrow M_{d,o,c} + 1.
+\]
+In addition to the aggregated matrix, an event log is maintained containing the frame index, track ID, origin, destination, class label, and confidence for each detected transition.
+
+\subsubsection{Outputs and Quality Control}
+\label{subsubsec:method_outputs}
+
+The pipeline produces several outputs to support analysis and validation:
+\begin{itemize}
+    \item \textbf{Annotated video:} including bounding boxes, trajectories, gate zones, and live O--D summaries.
+    \item \textbf{Tracking statistics:} such as processing time, achieved FPS, total detections, and frames with detections lacking track IDs.
+    \item \textbf{Track filtering:} tracks can be filtered based on a minimum number of frames to remove spurious detections.
+\end{itemize}
+
+An example of the annotated output is shown in Figure~\ref{fig:tracking_output}. The figure illustrates how detected vehicles are represented with bounding boxes, track IDs, and class labels, as well as their trajectories over time. Gate zones are visualized as polygons, and the region of interest (ROI) is highlighted. In addition, a live overlay displays the current origin-destination counts.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project/images/tracking_output.png}
+    \caption{Annotated tracking output showing detections, trajectories, gate zones, and O--D overlay.}
+    \label{fig:tracking_output}
+\end{figure}

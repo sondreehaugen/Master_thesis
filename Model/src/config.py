@@ -1,10 +1,9 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from pathlib import Path
 
 
-@dataclass(slots=True)
+@dataclass
 class TrackingConfig:
     track_display_len: int = 150
     conf_thres: float = 0.6
@@ -21,7 +20,7 @@ class TrackingConfig:
     draw_count_overlay: bool = True
 
 
-@dataclass(slots=True)
+@dataclass
 class AppConfig:
     model_name: str = "yolo26_fine-tuned.pt"
     tracker_name: str = "my_new_botsort.yaml"

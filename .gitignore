@@ -71,3 +71,6 @@ Model/runs/
 # Auto-genererte dataset-filer (regenereres av prepare_dataset.py)
 Model/dataset/labels/
 *.cache
+*.pt
+*.xlsx
+.tex 

@@ -1,0 +1,21 @@
+tracker_type: botsort
+
+# Strengere krav til deteksjoner - reduserer false positives
+track_high_thresh: 0.28
+track_low_thresh: 0.12
+new_track_thresh: 0.28
+
+# Veldig lang hukommelse - holder tracks gjennom hele svingen
+track_buffer: 90
+
+# Maksimal strenghet på matching - minimerer ID-bytte
+match_thresh: 0.90
+fuse_score: True
+
+gmc_method: none
+
+# Strengere avstands- og utseendebasert matching
+proximity_thresh: 0.75
+appearance_thresh: 0.35
+with_reid: False
+model: auto
