@@ -1,5 +1,0 @@
-ultralytics
-opencv-python==4.9.0.80   # 4.10+ krever numpy>=2 som ikke er kompatibel med torch 2.2
-numpy<2                    # torch 2.2.2 er kompilert mot numpy 1.x
-torch==2.2.2
-torchvision==0.17.2

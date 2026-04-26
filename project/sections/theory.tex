@@ -1,81 +1,57 @@
 \chapter{Theory}
-\label{sec:theory}
+\label{chap:theory}
 This chapter presents the theoretical framework for AI-based traffic data extraction from intersection video. Section~\ref{sec:traffic_eng} reviews safety trends, design standards, and multimodal data needs. Section~\ref{sec:computer_vision} covers deep learning detection/tracking with focus on the YOLO model. Finally, Section~\ref{sec:literature_review_research_gap} reviews prior work and knowledge gap within the field of automatic object detection.
 
 
-\section{Traffic Engineering and Intersection Design}
-\label{sec:traffic_eng}
-This section establishes the traffic engineering context, reviewing safety trends, intersection characteristics, design standards (N100, V121), current data collection methods (V714), and their limitations for detailed multimodal analysis at intersections.
- 
-\subsection{Traffic Safety Policy and Accident Burden}
-\label{sec:safety_policy}
-
-Norway has pursued a systematic approach to reducing road traffic fatalities over several decades. In the 1970s, approximately 500 persons were killed annually; by 2024, this figure had declined to 87~\citep{trafikksikkerhetsutviklingen2024, regjeringen2024_meldst14}. As shown in \autoref{fig:drept_hardt_skadde}, however, recent developments indicate that Norway is currently not on track to achieve the Vision Zero interim targets for 2030.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.65\linewidth]{project/images/fatalitiesandinjured.png}
-    \caption[Development in road traffic fatalities and serious injuries in Norway, with interim targets for 2030 and 2050]
-    {Development in road traffic fatalities and serious injuries in Norway, with interim targets for 2030 and 2050. Reproduced from \citep{trafikksikkerhetsutviklingen2024}}
-
-    \label{fig:drept_hardt_skadde}
-\end{figure}
-
-Intersections represent a consistently disproportionate share of road traffic casualties. Despite the overall reduction in total fatalities and serious injuries since 2001, the intersection share has not declined correspondingly \citep{svv_trine}, indicating a continued and specific need for targeted safety measures at these locations, as illustrated in \autoref{fig:prosentandel_kryss}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images/prosentandel_kryss.png}
-    \caption[Percentage of road traffic fatalities and serious injuries occurring at intersections (2001-2024)]
-    {Percentage of road traffic fatalities and serious injuries occurring at intersections (2001-2024). Based on data from TRINE \citep{svv_trine}.
-}
-    \label{fig:prosentandel_kryss}
-\end{figure}
-
-The societal costs associated with these accidents are substantial. Applying unit cost rates from the V712 \textit{Consequence Analysis} \citep{svv_v712_2025}, intersection accidents incurred approximately 4.1~billion NOK in societal costs in 2024 alone, with cumulative costs exceeding 128~billion NOK over the period 2001--2024. These figures underscore the economic, in addition to the human, imperative for improved road safety at intersections.
-
-\subsection{Intersection Types and Safety Characteristics}
-\label{sec:intersection_types}
-
-Intersections can be classified into several geometric configurations, with T-intersections (three-legged) and X-intersections (four-legged) being the most common forms. Their safety characteristics differ significantly due to variations in the number of conflict points — locations where vehicle trajectories intersect, merge, or diverge. As illustrated in \autoref{fig:konfliktpunkter}, a T-intersection contains 9 conflict points compared to 32 in an X-intersection \citep{svv_V121}, resulting in a substantially lower collision probability and lower average accident costs per incident.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project/images/Konfliktpunkter.png}
-    \caption[Conflict points in T-intersections and X-intersections]{Conflict points in T-intersections (9 points) and X-intersections (32 points). Source: N-V121 \citep{svv_V121}, p. 7}
-    \label{fig:konfliktpunkter}
-\end{figure}
-
-Between 30 and 40 percent of all police-reported accidents occur at intersections and driveways \citep{svv_V121}, with the most severe incidents involving vehicles on crossing trajectories or conflicts with pedestrians and cyclists. Average societal costs per personal injury accident vary by intersection type: 2.0 million NOK for T-intersections, 1.8 million NOK for X-intersections, and 1.3 million NOK for roundabouts (2009 prices) \citep{svv_V121}.
+%\section{Traffic Engineering and Intersection Design}
+%\label{sec:traffic_eng}
+%This section establishes the traffic engineering context, reviewing safety trends, intersection characteristics, design standards (N100, V121), current data collection methods (V714), and their limitations for detailed multimodal analysis at intersections.
 
 
-\subsection{Geometric Design Requirements}
-\label{sec:geometric_design}
-The Norwegian Public Roads Administration's handbooks \textit{N100: Road and Street Design} \citep{svv_n100} and \textit{N-V121: Geometric Design of Road and Street Intersections} \citep{svv_V121} establish the regulatory framework for road and intersection design in Norway. These standards specify geometric requirements based on key traffic parameters, including traffic volumes, vehicle composition, turning movements, and the presence of pedestrians and cyclists.
+%\subsection{Intersection Types and Safety Characteristics}
+%\label{sec:intersection_types}
 
-A \textit{design vehicle} is the vehicle type used as the basis for determining geometric design parameters such as turning radius, lane width, and corner radii \citep{svv_n100}. According to N100, the selected design vehicle defines both physical dimensions (length, width) and expected driving behaviour, including lane discipline, allowable speeds through intersections, and whether encroachment into adjacent lanes or reversing is permitted. Intersections dimensioned for passenger cars must nevertheless remain accessible to trucks, albeit through less favorable driving maneuvers \citep{svv_n100}. 
+%Intersections can be classified into several geometric configurations, with T-intersections (three-legged) and X-intersections (four-legged) being the most common forms. Their safety characteristics differ significantly due to variations in the number of conflict points — locations where vehicle trajectories intersect, merge, or diverge. As illustrated in \autoref{fig:konfliktpunkter}, a T-intersection contains 9 conflict points compared to 32 in an X-intersection \citep{svv_V121}, resulting in a substantially lower collision probability and lower average accident costs per incident.
 
-\autoref{fig:design_vehicle} illustrates this principle, showing the swept path of heavy vehicles through an urban intersection designed primarily for cars. In accordance with N100 requirement 5.2--2, truck accessibility is ensured, although it requires unconventional driving behaviour.
+%\begin{figure}[H]
+  %  \centering
+ %   \includegraphics[width=0.8\linewidth]{project/images/Konfliktpunkter.png}
+%    \caption[Conflict points in T-intersections and X-intersections]{Conflict points in T-intersections (9 points) and X-intersections (32 points). Source: N-V121 \citep{svv_V121}, p. 7}
+  %  \label{fig:konfliktpunkter}
+%\end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{project/images/design_vehicle.png}
-    \caption[Swept path comparison between heavy vehicles and passenger cars through an urban intersection]{Swept path comparison between heavy vehicles and passenger cars through an urban intersection. Reproduced from \citep{NACTO_DesignVehicle}.}
-    \label{fig:design_vehicle}
-\end{figure}
+%Between 30 and 40 percent of all police-reported accidents occur at intersections and driveways \citep{svv_V121}, with the most severe incidents involving vehicles on crossing trajectories or conflicts with pedestrians and cyclists. Average societal costs per personal injury accident vary by intersection type: 2.0 million NOK for T-intersections, 1.8 million NOK for X-intersections, and 1.3 million NOK for roundabouts (2009 prices) \citep{svv_V121}.
 
-In urban intersections, pedestrian and cyclist safety requires particular attention due to frequent conflicts with motorized traffic \citep{svv_V121}. Compact geometric designs with tight corner radii and constrained lane widths serve dual purposes: forcing drivers to reduce speed while shortening crossing distances for vulnerable road users. The selected design vehicle must therefore reflect dominant traffic composition and intended road function, while accommodating less frequent vehicle types through alternative maneuvers. Geometric design thus requires balancing motorized vehicle requirements against the safety needs of pedestrians and cyclists.
 
-Accurate traffic data capturing vehicle composition, turning movements, and vulnerable road users presence are therefore essential for verifying whether intersection designs function as intended and meet the requirements outlined in N100 and V121.
+%\subsection{Geometric Design Requirements}
+%\label{sec:geometric_design}
+%The Norwegian Public Roads Administration's handbooks \textit{N100: Road and Street Design} \citep{svv_n100} and \textit{N-V121: Geometric Design of Road and Street Intersections} \citep{svv_V121} establish the regulatory framework for road and intersection design in Norway. These standards specify geometric requirements based on key traffic parameters, including traffic volumes, vehicle composition, turning movements, and the presence of pedestrians and cyclists.
 
-\subsection{Traffic Data Collection for Intersections}
-\label{sec:traffic_data}
-Traffic data form the foundation for evidence-based decisions in road infrastructure planning, design, and safety analysis, capturing key metrics such as vehicle volumes, turning movements, speeds, and multimodal interactions (vehicles, cyclists, pedestrians) \citep{SVV_V714}. In Norway, the Norwegian Public Roads Administration's Handbook V714 \textit{Traffic Data Guidelines} regulates collection and management \citep{SVV_V714}. Data are gathered via manual or automated methods, each with strengths suited to specific applications \citep{SVV_V714}.
+%A \textit{design vehicle} is the vehicle type used as the basis for determining geometric design parameters such as turning radius, lane width, and corner radii \citep{svv_n100}. According to N100, the selected design vehicle defines both physical dimensions (length, width) and expected driving behaviour, including lane discipline, allowable speeds through intersections, and whether encroachment into adjacent lanes or reversing is permitted. Intersections dimensioned for passenger cars must nevertheless remain accessible to trucks, albeit through less favorable driving maneuvers \citep{svv_n100}. 
 
-In Norway, the collection and management of traffic data are regulated by the Norwegian Public Roads Administration through Handbook V714: Traffic Data Guidelines \citep{SVV_V714}. Traffic data can be collected using both manual and automated methods, depending on the purpose, required accuracy, and temporal coverage \citep{SVV_V714}.
+%\autoref{fig:design_vehicle} illustrates this principle, showing the swept path of heavy vehicles through an urban intersection designed primarily for cars. In accordance with N100 requirement 5.2--2, truck accessibility is ensured, although it requires unconventional driving behaviour.
+
+%\begin{figure}[H]
+  %  \centering
+   % \includegraphics[width=1\linewidth]%{project/images/design_vehicle.png}
+ %   \caption[Swept path comparison between heavy vehicles and passenger cars through an urban intersection]{Swept path comparison between heavy vehicles and passenger cars through an urban intersection. Reproduced from \citep{NACTO_DesignVehicle}.}
+  %  \label{fig:design_vehicle}
+%\end{figure}
+
+%In urban intersections, pedestrian and cyclist safety requires particular attention due to frequent conflicts with motorized traffic \citep{svv_V121}. Compact geometric designs with tight corner radii and constrained lane widths serve dual purposes: forcing drivers to reduce speed while shortening crossing distances for vulnerable road users. The selected design vehicle must therefore reflect dominant traffic composition and intended road function, while accommodating less frequent vehicle types through alternative maneuvers. Geometric design thus requires balancing motorized vehicle requirements against the safety needs of pedestrians and cyclists.
+
+%Accurate traffic data capturing vehicle composition, turning movements, and vulnerable road users presence are therefore essential for verifying whether intersection designs function as intended and meet the requirements outlined in N100 and V121.
+
+%\subsection{Traffic Data Collection for Intersections}
+%\label{sec:traffic_data}
+%Traffic data form the foundation for evidence-based decisions in road infrastructure planning, design, and safety analysis, capturing key metrics such as vehicle volumes, turning movements, speeds, and multimodal interactions (vehicles, cyclists, pedestrians) \citep{SVV_V714}. In Norway, the Norwegian Public Roads Administration's Handbook V714 \textit{Traffic Data Guidelines} regulates collection and management \citep{SVV_V714}. Data are gathered via manual or automated methods, each with strengths suited to specific applications \citep{SVV_V714}.
+
+%In Norway, the collection and management of traffic data are regulated by the Norwegian Public Roads Administration through Handbook V714: Traffic Data Guidelines \citep{SVV_V714}. Traffic data can be collected using both manual and automated methods, depending on the purpose, required accuracy, and temporal coverage \citep{SVV_V714}.
+
+\section{Current Methods for Traffic Data Collection}
+This section reviews current methods for traffic data collection, including both traditional and emerging technologies. It first describes manual traffic counts and common automated sensing technologies used in Norway, followed by a discussion of LiDAR as an emerging alternative. The section then outlines the main limitations of existing approaches, particularly in the context of detailed intersection monitoring. Finally, international practices are briefly reviewed to provide context on how other countries are adopting and combining different traffic data collection technologies.
 
 \subsubsection{Manual Traffic Counts:}
-
 Manual counts involve personnel recording data on forms or digital devices (e.g., PDAs, laptops). \citep{SVV_V714} They excel at detailed, short-term observations (typically 1--4 hours) during peaks, providing turning movements and multimodal data with high accuracy under controlled conditions. \citep{SVV_V714} However, they cannot capture full temporal variations (daily/weekly/seasonal) without excessive cost and labor. \citep{SVV_V714}
 
 \subsubsection{Automated Traffic Counts:}
@@ -134,7 +110,7 @@ In the United States, traffic data collection relies on a mix of technologies wi
 
 In the UK, local authorities have documented the operational use of video-based traffic sensors combined with artificial intelligence. Cambridgeshire County Council reports the deployment of Vivacity sensors to collect classified traffic flow data for transport planning and decision-making, using AI applied to video to count and classify vehicles, pedestrians, and cyclists \citep{VivacityValidation2022}. 
 
-These examples indicate that while video-based and AI-enabled systems are increasingly used for traffic monitoring and data collection, this is typically in combination with other technologies or within pilot and local operational contexts. No evidence has been identified of national road authorities relying solely on video-based data for vehicle classification as a normative basis for traffic data used in design or dimensioning.
+These examples indicate that while video-based and AI-enabled systems are increasingly used for traffic monitoring and data collection, this is typically in combination with other technologies or within pilot and local operational contexts. No evidence has been identified of national road authorities relying solely on video-based data for vehicle classification as a normative basis for traffic data collection.
 
 \section{Deep Learning and Computer Vision}
 \label{sec:computer_vision}
@@ -150,7 +126,7 @@ Vision-based analysis tasks are commonly categorised into three progressively mo
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{images/Classification.png}
+    \includegraphics[width=1\linewidth]{images/Classification1.png}
     \caption{Conceptual illustration of the differences between image classification, object detection, and object tracking in computer vision.}
     \label{fig:Classification}
 \end{figure}
@@ -225,7 +201,7 @@ adopted class of one-stage object detectors. YOLO models perform object
 localisation and classification in a single forward pass of a convolutional 
 neural network, directly predicting bounding box coordinates and class 
 probabilities across the full image without an intermediate region proposal 
-stage \citep{Redmon2016}. A defining characteristic of the framework is its 
+stage \citep{Redmon2016}. A defining characteristic of the framework is it's 
 emphasis on global image reasoning: rather than processing candidate regions 
 independently, YOLO considers the full image context during detection, which 
 contributes to both fast inference and reduced false positives in visually 
@@ -256,7 +232,7 @@ configurations.
     \includegraphics[width=0.95\linewidth]{project/images/YOLO_timeline.png}
     \caption[Timeline of YOLO model releases, 2015--2025]{Timeline of YOLO 
     model releases, 2015--2025, including YOLO26 as the most recent 
-    Ultralytics release. Source: \citep{DecadeOfYOLO, YOLOv1-v8, 
+    Ultralytics release. Source: \cite{DecadeOfYOLO, YOLOv1-v8, 
     Sapkota2025YOLOReview}.}
     \label{fig:yolo_timeline}
 \end{figure}
@@ -272,10 +248,31 @@ camera frame, which is essential when monitoring intersections where vehicles
 of varying dimensions, cyclists, and pedestrians must all be reliably 
 identified. These characteristics make YOLO-based architectures a well-founded 
 methodological basis for the detection pipeline developed in this thesis, as 
-discussed further in \autoref{sec:methods}.
+discussed further in \autoref{chap:methods}.
+
+\subsection{The COCO Dataset}
+The Microsoft Common Objects in Context (COCO) dataset was introduced by \cite{COCO_dataset} as a large-scale object detection benchmark containing 328,000 images with 2.5 million labeled instances across 91 object categories. The dataset was later refined into the COCO 2017 version, which standardizes 80 object categories across 330,000 images with 200,000 annotated for object detection, segmentation, and captioning tasks. The dataset is split into three subsets: Train2017 (118K images), Val2017 (5K images), and Test2017 (20K images)\citep{ultralytics2024coco}. YOLO models are pre-trained on the COCO training set to leverage learned representations from diverse object categories before fine-tuning on task-specific detection tasks.
+
+\subsection{YOLO26: Key Advancements}
+\label{sec:yolo26-advancements}
+YOLO26 architectural details and initial benchmarks were first detailed in a September 2025 preprint \citep{sapkota2026yolo26keyarchitecturalenhancements}, with the full public release of models occurring in January 2026. Regarding it's distribution, the model is provided under a dual-licensing scheme: it is available under the open-source AGPL-3.0 license for researchers and open-source projects, while an Enterprise License is required for proprietary commercial applications \citep{Ultralytics2024}.
+
+A primary advancement in YOLO26 is its fully end-to-end inference pipeline that eliminates Non-Maximum Suppression (NMS) entirely. By removing this traditional post-processing step for duplicate bounding boxes, the model achieves substantially lower latency. When combined with the removal of Distribution Focal Loss (DFL), which simplifies bounding-box regression, YOLO26 delivers up to 43\% faster CPU inference compared with previous YOLO versions \citep{sapkota2026yolo26keyarchitecturalenhancements}. These changes make the architecture particularly well-suited for real-time applications on resource-constrained hardware without requiring high-end GPUs.
+
+Furthermore, YOLO26 introduces Progressive Loss Balancing (ProgLoss) and Small-Target-Aware Label Assignment (STAL) to improve training dynamics and small-object performance. ProgLoss adaptively reweights the individual loss terms throughout training, reducing the dominance of easy examples and promoting more balanced learning. STAL, in turn, gives higher priority to small or heavily occluded targets during label assignment. In the context of traffic surveillance, this noticeably enhances detection of distant or partially obscured vehicles. Finally, the novel MuSGD optimizer accelerates convergence while improving stability, which simplifies fine-tuning on custom vehicle datasets and reduces sensitivity to hyperparameter choices \citep{sapkota2026yolo26keyarchitecturalenhancements}.
+
+
+\autoref{fig:YOLO_compare_chart}  illustrates the accuracy–latency trade-off of various YOLO26 model variants compared to previous YOLO generations on the COCO dataset, plotting COCO mAP$  ^{50-95}  $ against inference latency. The YOLO26 variants (highlighted in blue) demonstrate a highly favorable position in this trade-off, offering competitive or superior accuracy at notably lower latency.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{project//images/YOLO_compare_chart.jpg}
+    \caption[YOLO26 variants and their performance on COCO dataset.]{YOLO26 variants and their performance on COCO dataset compared to previous versions. Reproduced from \cite{ultralytics_yolo26}}
+    \label{fig:YOLO_compare_chart}
+\end{figure}
 
 \subsection{YOLO26 Architecture Overview}
-
+\label{sec:yolo26_architecture}
 YOLO26 follows the classic single-stage, end-to-end object detection paradigm introduced in earlier Ultralytics YOLO versions. The network is composed of three main modules; backbone, neck, and head, and it processes an input image of size $640 \times 640 \times 3$. The architecture is defined in Ultralytics official \texttt{yolo26.yaml} configuration file and is fully described in the comprehensive analysis by Hidayatullah and Tubagus (2026). \autoref{fig:YOLO26_architecture} illustrates the complete CNN-based architecture of YOLO26, including the flow of feature maps and the location of the key components.
 
 The model supports five different scales (nano, small, medium, large, and extra-large) that are controlled by three scaling parameters: \texttt{depth\_multiple}, \texttt{width\_multiple}, and \texttt{max\_channels}.
@@ -298,24 +295,24 @@ The head's main objective is to translate the fused multi-scale features into th
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{project//images/YOLO26_architecture.png}
-    \caption{YOLO26 Architecture Diagram. Reproduced from \cite{hidayatullah2026yolo26}, available under \href{https://creativecommons.org/licenses/by/4.0/}{CC BY 4.0}.}
+    \caption[YOLO26 Architecture Diagram]{YOLO26 Architecture Diagram. Reproduced from \cite{hidayatullah2026yolo26}, available under \href{https://creativecommons.org/licenses/by/4.0/}{CC BY 4.0}.}
     \label{fig:YOLO26_architecture}
 \end{figure}
 
 \subsection{Multi-Object Tracking and Trajectory Extraction}
 \label{sec:multi_object_tracking}
-Measuring traffic parameters such as turning movements requires more than object detection alone; it necessitates Multi-Object Tracking. Multi-Object Tracking assigns a persistent and unique identifier to each detected road user across consecutive video frames, enabling trajectory estimation and movement analysis \citep{Hassan2024}.
+Measuring traffic parameters such as turning movements requires more than object detection alone; it necessitates Multi-Object Tracking (MOT). MOT assigns a persistent and unique identifier to each detected road user across consecutive video frames, enabling trajectory estimation and movement analysis \citep{Hassan2024}.
 
-Detection-Based Tracking is the most widely used Multi-Object Tracking paradigm in practical systems \citep{yang2022videoobjecttrackingbased}. Frameworks such as DeepSORT combine high-performance object detection with appearance-based association and motion prediction, typically using a Kalman filter. As Detection-Based Tracking relies directly on the quality and consistency of object detections, its performance is strongly influenced by the underlying detection model. This approach enables robust tracking even under temporary occlusion and is therefore well suited for traffic monitoring scenarios.
+In practice, most MOT systems follow a detection-based tracking paradigm, where per-frame object detections are linked over time using a combination of motion modelling and data association \citep{yang2022videoobjecttrackingbased}. Motion modelling is commonly handled using a Kalman filter, while association between existing tracks and new detections is typically solved using an assignment algorithm (e.g., Hungarian matching) based on geometric overlap (IoU) and/or detection confidence. 
 
-The resulting trajectory data enable the extraction of traffic volume, modal split, and turning movement information required for capacity and intersection analysis.
+Modern trackers such as ByteTrack and BoT-SORT extend this pipeline with more robust association strategies. In particular, BoT-SORT can incorporate appearance cues through re-identification (ReID) features to recover identities after missed detections or short-term occlusions. However, appearance-based ReID may degrade under strong visual artifacts (e.g., blur/pixelation) and prolonged occlusions, which are common in real-world traffic video. 
 
 \section{Performance Evaluation Metrics}
 \label{sec:evaluation_metrics}
 To quantitatively assess the effectiveness of the YOLO architecture on the traffic dataset, several standard computer vision metrics are employed. These metrics evaluate the model's ability to both correctly localize and accurately classify vehicles \citep{vijayakumar2024yolo}.
 
 \subsection*{Intersection over Union (IoU)}
-The fundamental building block for evaluating detection accuracy is Intersection over Union (IoU). This metric measures the overlap between the predicted bounding box (\(B_p\)) and the ground truth box (\(B_gt\)) provided during the manual annotation. It is calculated as:
+The fundamental building block for evaluating detection accuracy is Intersection over Union (IoU). This metric measures the overlap between the predicted bounding box (\(B_p\)) and the ground truth box (\(B_{gt}\)) provided during the manual annotation. It is calculated as:
 
 \begin{equation}
 IoU = \frac{\text{Area}(B_p \cap B_{gt})}{\text{Area}(B_p \cup B_{gt})}
@@ -346,10 +343,25 @@ Where \(p(r)\) is the precision as a function of recall.
 While the AP measures the performance for single class, Mean Average Precision (mAP) is the standard metric used to evaluate the overall performance of a multi-class object detection model like YOLO. If N represents the total number of classes, the mAP is calculated as:
 
 \begin{equation}
+\label{eq:mAP_calc}
 mAP = \frac{1}{N} \sum_{i=1}^{N} AP_i
 \end{equation}
 
-The literature commonly reports two versions of mAP to provide a complete picture of model performance. The mAP$_{50}$ represents the mAP calculated at a fixed IoU treshold of 0.5. This means that a detection is labeled as a True Positive if the overlap between the predicted box and the GT box is minimum 50\%. Instead of using a single treshold, mAP$_{50-95}$ uses the average of mAP values calculated at ten different IoU tresholds from 0.5 to 0.95, in 0.05 increments. This metric rewards models for superior localization accuracy.
+The literature commonly reports two versions of mAP to provide a complete picture of model performance. The mAP$^{50}$ represents the mAP calculated at a fixed IoU treshold of 0.5. This means that a detection is labeled as a True Positive if the overlap between the predicted box and the GT box is minimum 50\%. Instead of using a single treshold, mAP$^{50-95}$ uses the average of mAP values calculated at ten different IoU tresholds from 0.5 to 0.95, in 0.05 increments. This metric rewards models for superior localization accuracy.
+
+\subsection*{MOT Evaluation Metrics}
+Standard multi-object tracking metrics such as Multiple Object Tracking Accuracy (MOTA), Multiple Object Tracking Precision (MOTP), and IDF1 penalise detection misses, false positives, localisation errors, and identity switches, making them well-suited for evaluating trajectory continuity in general MOT tasks \citep{JIMENEZBRAVO202243}. However, these metrics require dense frame-by-frame identity annotations across thousands of frames, which is extremely time-consuming and impractical. 
+
+Instead, we evaluated the detection + tracking pipelines using task-specific metrics based on manually annotated ground-truth Origin–Destination (O–D) matrices. Performance is measured using:
+
+\begin{align}
+\mathrm{MAE}_{\text{cell}} &= \frac{1}{|\mathcal{R}||\mathcal{C}|} \sum_{r,c} |\hat{T}_{r,c} - T_{r,c}| \label{eq:mae_cell}\\[0.5em]
+\mathrm{MAE}_{\text{route}} &= \frac{1}{|\mathcal{R}|} \sum_{r} |\hat{S}_r - S_r| \label{eq:mae_route}\\[0.5em]
+E_{\text{total}} &= \sum_r \hat{S}_r - \sum_r S_r \label{eq:total_error}\\[0.5em]
+\%\mathrm{Err}_{\text{abs}} &= \frac{|E_{\text{total}}|}{\sum_r S_r} \cdot 100 \label{eq:pct_error}
+\end{align}
+
+where $T_{r,c}$ is the count for route $r$ and class $c$, and $S_r$ is the total count for route $r$. Additionally, $E_{\text{total}}$ measures the net prediction error across all routes, while $\%\mathrm{Err}_{\text{abs}}$ normalizes this error as a percentage of ground truth, enabling comparison across videos of different scales. Together, these metrics quantify directional accuracy (route-level), class-specific performance (cell-level), and overall counting reliability, directly measuring how accurately the pipeline reproduces final aggregated traffic movements.
 
 \section{Literature Review and Research Gap}
 \label{sec:literature_review_research_gap}
@@ -360,7 +372,7 @@ This section reviews prior studies on deep learning–based vehicle detection fo
 \label{previous_work}
 Several studies have investigated the performance of deep learning models for vehicle detection and classification using established benchmark datasets. For example, \cite{Ma2024} evaluated multiple one-stage and two-stage detection models on the PASCAL VOC 2012 dataset, a commonly used dataset in Computer Vision \citep{Everingham10,HuggingFacePascalVOC}. Although the dataset consists of still images rather than video sequences, the authors report that some one-stage models achieve processing speeds of up to 45 frames per second, but with lower detection accuracy compared to slower two-stage models. The study primarily formulates vehicle detection as a generic object detection task, and the number of vehicle classes used for classification is not explicitly specified.
 
-\cite{Song2019VisionBasedVehicle} trained and evaluated a vision-based vehicle detection and counting system using YOLOv3 for object detection in combination with Oriented FAST and Rotated BRIEF (ORB), a feature detection and description algorithm, for multi-object tracking (MOT). The ORB algorithm extracts features within each detected bounding box and matches them across consecutive frames to maintain object correspondence over time \cite{Song2019VisionBasedVehicle}. The dataset consisted of images captured from a variety of viewpoints and included three vehicle classes: cars, buses, and trucks. The authors report a mean average precision (mAP) of 87.88\%, with very small class deviations from this value. Using ORB-based tracking, the system achieved a vehicle counting accuracy of 93.2\% and a direction recognition accuracy of 92.3\%, while maintaining processing speeds close to real time. Although these results demonstrate strong performance for traffic monitoring, the study is limited to highway environments and a small number of vehicle classes.
+\cite{Song2019VisionBasedVehicle} trained and evaluated a vision-based vehicle detection and counting system using YOLOv3 for object detection in combination with Oriented FAST and Rotated BRIEF (ORB), a feature detection and description algorithm, for multi-object tracking (MOT). The ORB algorithm extracts features within each detected bounding box and matches them across consecutive frames to maintain object correspondence over time \citep{Song2019VisionBasedVehicle}. The dataset consisted of images captured from a variety of viewpoints and included three vehicle classes: cars, buses, and trucks. The authors report a mean average precision (mAP) of 87.88\%, with very small class deviations from this value. Using ORB-based tracking, the system achieved a vehicle counting accuracy of 93.2\% and a direction recognition accuracy of 92.3\%, while maintaining processing speeds close to real time. Although these results demonstrate strong performance for traffic monitoring, the study is limited to highway environments and a small number of vehicle classes.
 
 \cite{smartcities6050134} performed a large-scale comparison of Single Shot Detector (SSD), Faster R-CNN, and multiple YOLO variants using video data from 9 different datasets, recorded under diverse conditions, including nighttime, adverse weather, occlusions, and varying camera viewpoints. Their results show that YOLO-based models consistently outperform SSD (Single Shot Multibox Detector) and Faster R-CNN in terms of detection accuracy, localization precision, and computational efficiency. In particular, YOLO variants achieved detection accuracies above 95\% and overall classification accuracies exceeding 90\% for cars, trucks, and buses, while maintaining near real-time inference speeds. Although Faster R-CNN demonstrated competitive performance in some localization tasks, its substantially higher computational cost limited its suitability for continuous video-based traffic surveillance. The study therefore concludes that YOLO-based architectures provide the most favorable trade-off between accuracy and efficiency for real-time traffic monitoring applications.
 
@@ -380,6 +392,4 @@ Furthermore, \cite{DeepLearningTrafficScene2025} emphasize that YOLO-based detec
 
 To address these identified gaps, this thesis applies a deep learning–based object detection framework to video data from fixed roadside cameras in real intersection environments. The study expands beyond standard benchmark evaluations by focusing on a broader range of traffic participants relevant to Norwegian design guidelines. Furthermore, detection performance is evaluated under realistic operational conditions, including varying lighting, traffic density, and partial occlusion.
 
-The extent to which the research gap is addressed is measured through a quantitative comparison between automatically extracted traffic parameters and manually conducted traffic counts. Specifically, traffic volumes, vehicle composition, and turning movements are compared using accuracy metrics and error analysis to determine whether the deep learning–based approach provides data of sufficient precision and reliability to serve as decision-support input in accordance with N100 and V121. This evaluation framework enables a systematic assessment of both detection performance and practical applicability in real-world intersection monitoring.
-
-% Enda mer målbart: Inkludere flere klasser uten at det går på bekostning av accuracy
+The extent to which these research gaps are addressed is evaluated by quantitatively comparing the automatically extracted traffic parameters (traffic volumes, vehicle composition, and turning movements) against the performance levels and limitations reported in prior studies, using accuracy metrics and error analysis. This determines whether the deep learning–based approach achieves sufficient precision and reliability for operational decision-support, while also testing its practical applicability in real-world intersection monitoring as called for in the literature.

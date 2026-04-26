@@ -1,106 +1,83 @@
 \chapter{Appendix}
 \label{chap:appendix}
+\textbf{NOT COMPLETE. WILL BE COMPLETED FOR FINAL SUBMISSION.}
 
 % --- Appendix A ---
+\section{YOLO26 Hyperparameters}
+\label{app:hyperparameters}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{ll|ll}
+\hline
+Parameter & Value & Parameter & Value \\
+\hline
+epochs & 100 & hsv\_s & 0.7 \\
+batch & 16 & hsv\_v & 0.4 \\
+imgsz & 640 & translate & 0.1 \\
+patience & 20 & scale & 0.5 \\
+lr0 & 0.01 & fliplr & 0.5 \\
+lrf & 0.01 & erasing & 0.4 \\
+momentum & 0.937 & mosaic & 1.0 \\
+weight\_decay & 0.0005 & mixup & 0.0 \\
+warmup\_epochs & 3.0 & close\_mosaic & 10 \\
+warmup\_momentum & 0.8 & iou & 0.7 \\
+box & 7.5 & max\_det & 300 \\
+cls & 0.5 & optimizer & auto \\
+dfl & 1.5 & split & val \\
+hsv\_h & 0.015 & seed & 42 \\
+\hline
+\end{tabular}
+\caption{Default training hyperparameters (from args.yaml) used for YOLO26n and YOLO26m models.}
+\label{tab:yolo_hyperparameters}
+\end{table}
+
+% --- Appendix B ---
 \section{Detailed Training and Validation Metrics}
 \label{app:raw_metrics}
 This appendix contains the complete set of training logs and the non-normalized confusion matrix.
 
 \begin{table}[H]
 \centering
-\caption{Validation performance metrics for YOLO26n across classes. No instances of motorcycles or bicycles ended up in the validation set.}
-\label{tab:yolo_results}
+\caption{YOLO26n Validation Set Results ($n=192$)}
+\label{tab:val_results}
 \begin{tabular}{lcccccc}
 \hline
-\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{R} & \textbf{mAP50} & \textbf{mAP50-95} \\ \hline
-all & 151 & 609 & 0.690 & 0.763 & 0.773 & 0.614 \\
-Bus & 9 & 9 & 0.581 & 0.778 & 0.748 & 0.593 \\
-Car & 140 & 499 & 0.852 & 0.950 & 0.964 & 0.799 \\
-Heavy truck & 35 & 35 & 0.626 & 0.857 & 0.780 & 0.683 \\
-Light truck & 10 & 11 & 0.648 & 0.670 & 0.581 & 0.463 \\
-Person & 12 & 15 & 0.722 & 0.520 & 0.682 & 0.333 \\
-Semi-trailer* & 39 & 40 & 0.713 & 0.806 & 0.880 & 0.809 \\ \hline
-\multicolumn{7}{l}{\small *Full class name: Semi-trailer / combination vehicle}
+\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{Recall} & \textbf{mAP50} & \textbf{mAP50-95} \\
+\midrule
+all & 192 & 683 & 0.826 & 0.665 & 0.743 & 0.599 \\
+\midrule
+bicycle & 3 & 3 & 1.000 & 0.000 & 0.072 & 0.054 \\
+bus & 21 & 21 & 0.901 & 0.864 & 0.943 & 0.863 \\
+car & 157 & 520 & 0.923 & 0.948 & 0.977 & 0.804 \\
+heavy truck & 45 & 46 & 0.815 & 0.804 & 0.869 & 0.811 \\
+light truck & 16 & 16 & 0.628 & 0.500 & 0.649 & 0.617 \\
+motorcycle & 10 & 10 & 0.604 & 0.700 & 0.754 & 0.487 \\
+person & 16 & 22 & 0.840 & 0.717 & 0.834 & 0.397 \\
+semi-trailer & 44 & 45 & 0.899 & 0.789 & 0.846 & 0.760 \\ \hline
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_training/train_box_loss.png}
-    \caption[Training box loss]{Training box loss over 74 epochs, showing steady optimization of bounding box regression.}
-    \label{fig:train_box_loss}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_training/train_cls_loss.png}
-    \caption[Training classification loss]{Training classification loss over 74 epochs, indicating steady refinement of category assignment.}
-    \label{fig:train_cls_loss}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_training/val_box_loss.png}
-    \caption[Validation box loss]{Validation box loss over 74 epochs, indicating strong generalization of spatial localization.}
-    \label{fig:val_box_loss}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_training/val_cls_loss.png}
-    \caption[Validation classification loss]{Validation classification loss over 74 epochs, showing robust generalization across all vehicle classes.}
-    \label{fig:val_cls_loss}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/BoxF1_curve.png}
-    \caption[F1-Confidence curve]{F1-Confidence curve displaying the harmonic mean for all classes and individual vehicle categories to identify the optimal detection threshold.}
-    \label{fig:BoxF1_curve}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/BoxP_curve.png}
-    \caption[Precision-Confidence curve]{Precision-Confidence curve illustrating the model's prediction accuracy for all classes and specific categories as the confidence threshold increases.}
-    \label{fig:BoxP_curve}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/BoxR_curve.png}
-    \caption[recall-Confidence curve]{Recall-Confidence curve showing the detection sensitivity for all classes and individual categories relative to the confidence threshold.}
-    \label{fig:BoxR_Curve}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/confusion_matrix_raw.png}
-    \caption[Raw Confusion Matrix]{Raw Confusion Matrix displaying the absolute count of correct and incorrect detections across all vehicle classes and the background.}
-    \label{fig:conf_matrix_raw}
-\end{figure}
-
-
 \begin{table}[H]
 \centering
-\caption{Validation performance metrics for the YOLO26m model across all vehicle and traffic classes}
-\label{tab:validation_results}
+\caption{YOLO26m Validation Set Results ($n=192$)}
+\label{tab:val_results_m}
 \begin{tabular}{lcccccc}
 \toprule
 \textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Box(P)} & \textbf{Recall} & \textbf{mAP50} & \textbf{mAP50-95} \\ 
 \midrule
-\textbf{All} & 151 & 609 & 0.802 & 0.742 & 0.770 & 0.622 \\ 
+all & 192 & 683 & 0.765 & 0.853 & 0.900 & 0.721 \\
 \midrule
-Bus & 9 & 9 & 0.774 & 0.778 & 0.780 & 0.651 \\ 
-Car & 140 & 499 & 0.903 & 0.972 & 0.977 & 0.838 \\ 
-Heavy Truck & 35 & 35 & 0.681 & 0.771 & 0.810 & 0.702 \\ 
-Light Truck & 10 & 11 & 1.000 & 0.346 & 0.575 & 0.448 \\ 
-Person & 12 & 15 & 0.651 & 0.733 & 0.621 & 0.318 \\ 
-Semi-trailer* & 39 & 40 & 0.804 & 0.850 & 0.859 & 0.777 \\
+bicycle & 3 & 3 & 1.000 & 0.634 & 0.995 & 0.719 \\
+bus & 21 & 21 & 0.844 & 0.952 & 0.953 & 0.876 \\
+car & 157 & 520 & 0.896 & 0.977 & 0.987 & 0.820 \\
+heavy truck & 45 & 46 & 0.700 & 0.891 & 0.878 & 0.817 \\
+light truck & 16 & 16 & 0.412 & 0.625 & 0.645 & 0.603 \\
+motorcycle & 10 & 10 & 0.664 & 0.900 & 0.902 & 0.628 \\
+person & 16 & 22 & 0.773 & 0.955 & 0.941 & 0.514 \\
+semi-trailer & 44 & 45 & 0.831 & 0.889 & 0.903 & 0.789 \\ 
 \bottomrule
-\multicolumn{7}{l}{\small *Full class name: Semi-trailer / combination vehicle}
 \end{tabular}
 \end{table}
+
