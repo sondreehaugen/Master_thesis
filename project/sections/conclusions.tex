@@ -1,3 +1,15 @@
-\chapter{Conclusions}
 
-\label{sec:conclusion}
+\chapter{Conclusion}
+\label{chap:conclusion}
+
+This thesis demonstrates that YOLO-based vision methods can reliably extract traffic parameters from intersection video, including fine-grained vehicle classification and turning movements across both day and night conditions. Rather than requiring manual calibration at lighting transitions, an adaptive dual-tracker system automatically switches between optimized configurations, enabling continuous operation without intervention. More broadly, the work shows that detection quality is the primary performance driver; once a sufficiently accurate detector is deployed, different tracking algorithms yield comparable results. These findings confirm that vision-based monitoring is technically feasible for real-world traffic engineering applications, answering affirmatively all three research questions.
+
+However, the study reveals critical constraints that temper this optimism. Performance depends on infrastructure that meets basic requirements—particularly adequate frame rate ($\geq$10 FPS) and visual continuity, which cannot be assured across all existing camera networks. The pipeline was optimized for motorized vehicles; vulnerable road users remain unreliable due to both data scarcity and fundamental visual limitations at typical camera-to-object distances. Cross-site generalization was not evaluated, meaning that conclusions about transferability to new intersections remain uncertain. These limitations are not peripheral; they fundamentally constrain the applicability and generalizability of the method.
+
+The work's significance lies in bridging the gap between laboratory benchmarks and operational reality. Most prior vehicle-detection studies evaluate controlled datasets or short-term capture scenarios; this thesis validates performance across realistic seasonal transitions, privacy masking and dense traffic. The adaptive lighting mechanism is a pragmatic contribution that makes continuous deployment possible. Equally important, the open identification of constraints (frame rate thresholds, masking sensitivity, vulnerable-user gaps) provides a realistic foundation for practitioners deciding whether deployment is viable at a specific site, rather than overstating capability.
+
+The path forward requires acknowledging that incremental improvements to vision-based methods alone will not overcome fundamental limitations. Future work should focus on the systematic characterization of frame rate–performance, the expanded collection of vulnerable road users, and cross-site validation to assess generalization. Vision-based monitoring will remain valuable for high frequency volume and movement monitoring where modest accuracy trade-offs are acceptable, but this thesis suggests it is not a universal replacement for existing infrastructure. Within its demonstrated scope, adequately equipped stations, motorized vehicle monitoring, and non-critical applications, the pipeline offers a scalable, low-cost tool for modernizing traffic data collection in line with Vision Zero objectives.
+
+
+
+

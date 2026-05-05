@@ -1,0 +1,2 @@
+model,tracker,elapsed_s,unique_ids,cell_mae,sum_mae,class_relative_error,route_relative_error,total_gt,total_pred,total_err,total_abs_pct_err,perfect_routes
+YOLO26m_final.pt,transition_best,315.35577845573425,65,0.0,0.0,0.0,0.0,30,30,0,0.0,6

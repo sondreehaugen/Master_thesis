@@ -1,7 +1,6 @@
 \chapter{Theory}
 \label{chap:theory}
-This chapter presents the theoretical framework for AI-based traffic data extraction from intersection video. Section~\ref{sec:traffic_eng} reviews safety trends, design standards, and multimodal data needs. Section~\ref{sec:computer_vision} covers deep learning detection/tracking with focus on the YOLO model. Finally, Section~\ref{sec:literature_review_research_gap} reviews prior work and knowledge gap within the field of automatic object detection.
-
+This chapter outlines the theoretical basis for AI-based traffic data extraction from intersection video. Section~\ref{sec:traffic_data_collection_methods} reviews current traffic data collection methods and their limitations. Section~\ref{sec:computer_vision} introduces the required deep learning and computer vision concepts, with an emphasis on YOLO-based detection and multi-object tracking. Section~\ref{sec:evaluation_metrics} covers the performance evaluation metrics used to assess detection and tracking quality. Finally, Section~\ref{sec:literature_review_research_gap} synthesizes prior work and defines the research gaps addressed in this thesis.
 
 %\section{Traffic Engineering and Intersection Design}
 %\label{sec:traffic_eng}
@@ -27,9 +26,9 @@ This chapter presents the theoretical framework for AI-based traffic data extrac
 %\label{sec:geometric_design}
 %The Norwegian Public Roads Administration's handbooks \textit{N100: Road and Street Design} \citep{svv_n100} and \textit{N-V121: Geometric Design of Road and Street Intersections} \citep{svv_V121} establish the regulatory framework for road and intersection design in Norway. These standards specify geometric requirements based on key traffic parameters, including traffic volumes, vehicle composition, turning movements, and the presence of pedestrians and cyclists.
 
-%A \textit{design vehicle} is the vehicle type used as the basis for determining geometric design parameters such as turning radius, lane width, and corner radii \citep{svv_n100}. According to N100, the selected design vehicle defines both physical dimensions (length, width) and expected driving behaviour, including lane discipline, allowable speeds through intersections, and whether encroachment into adjacent lanes or reversing is permitted. Intersections dimensioned for passenger cars must nevertheless remain accessible to trucks, albeit through less favorable driving maneuvers \citep{svv_n100}. 
+%A \textit{design vehicle} is the vehicle type used as the basis for determining geometric design parameters such as turning radius, lane width, and corner radii \citep{svv_n100}. According to N100, the selected design vehicle defines both physical dimensions (length, width) and expected driving behavior, including lane discipline, allowable speeds through intersections, and whether encroachment into adjacent lanes or reversing is permitted. Intersections dimensioned for passenger cars must nevertheless remain accessible to trucks, albeit through less favorable driving maneuvers \citep{svv_n100}. 
 
-%\autoref{fig:design_vehicle} illustrates this principle, showing the swept path of heavy vehicles through an urban intersection designed primarily for cars. In accordance with N100 requirement 5.2--2, truck accessibility is ensured, although it requires unconventional driving behaviour.
+%\autoref{fig:design_vehicle} illustrates this principle, showing the swept path of heavy vehicles through an urban intersection designed primarily for cars. In accordance with N100 requirement 5.2--2, truck accessibility is ensured, although it requires unconventional driving behavior.
 
 %\begin{figure}[H]
   %  \centering
@@ -48,65 +47,85 @@ This chapter presents the theoretical framework for AI-based traffic data extrac
 
 %In Norway, the collection and management of traffic data are regulated by the Norwegian Public Roads Administration through Handbook V714: Traffic Data Guidelines \citep{SVV_V714}. Traffic data can be collected using both manual and automated methods, depending on the purpose, required accuracy, and temporal coverage \citep{SVV_V714}.
 
-\section{Current Methods for Traffic Data Collection}
-This section reviews current methods for traffic data collection, including both traditional and emerging technologies. It first describes manual traffic counts and common automated sensing technologies used in Norway, followed by a discussion of LiDAR as an emerging alternative. The section then outlines the main limitations of existing approaches, particularly in the context of detailed intersection monitoring. Finally, international practices are briefly reviewed to provide context on how other countries are adopting and combining different traffic data collection technologies.
+%\section{Current Methods for Traffic Data Collection}
+%\label{sec:traffic_data_collection_methods}
+%This section reviews current methods for traffic data collection, covering manual counts, automated sensing technologies common in Norway, and LiDAR as an emerging alternative, before discussing their limitations in the context of detailed intersection monitoring.
 
-\subsubsection{Manual Traffic Counts:}
-Manual counts involve personnel recording data on forms or digital devices (e.g., PDAs, laptops). \citep{SVV_V714} They excel at detailed, short-term observations (typically 1--4 hours) during peaks, providing turning movements and multimodal data with high accuracy under controlled conditions. \citep{SVV_V714} However, they cannot capture full temporal variations (daily/weekly/seasonal) without excessive cost and labor. \citep{SVV_V714}
+%\subsubsection{Manual Traffic Counts}
+%Manual counts involve personnel recording data on forms or digital devices such as PDAs and laptops \citep{SVV_V714}. They are well suited to detailed, short-term observations, typically lasting 1--4 hours during peak periods, and can capture turning movements and multimodal data with high accuracy \citep{SVV_V714}. However, capturing full temporal variation across days, weeks, and seasons is prohibitively labor-intensive and costly \citep{SVV_V714}.
 
-\subsubsection{Automated Traffic Counts:}
+%\subsubsection{Automated Traffic Counts:}
 
-\begin{itemize}
-    \item \textbf{Inductive loops:} Insulated wire loops installed in saw-cut slots in the pavement so that they form an electrical coil. When a vehicle passes over, the metal mass disturbs the electromagnetic field above the loop, and this change is used to register the vehicle’s presence as a detection event or count \citep{SVV_V714}.
+%\begin{itemize}
+ %   \item \textbf{Inductive loops:} Insulated wire loops installed in saw-cut slots in the pavement so that they form an electrical coil. When a vehicle passes over, the metal mass disturbs the electromagnetic field above the loop, and this change is used to register the vehicle’s presence as a detection event or count \citep{SVV_V714}.
 
-    \item \textbf{Radar sensors:} Employ the Doppler effect to detect vehicle speed and direction by transmitting pulses and analysing the frequency shift in reflected signals from approaching or receding objects. They register traffic volume and speed in both directions \citep{SVV_V714}.
+  %  \item \textbf{Radar sensors:} Employ the Doppler effect to detect vehicle speed and direction by transmitting pulses and analyzing the frequency shift in reflected signals from approaching or receding objects. They register traffic volume and speed in both directions \citep{SVV_V714}.
 
-    \item \textbf{Piezoelectric cable:} Pressure sensitive wires that generate measurable voltage proportional to applied force, detecting vehicle axles when two cables are laid transversely across the lane at fixed spacing.  They can be embedded in pavement like inductive loops or glued on surface for short-term use, enabling accurate speed, weight (WIM), axle counts, and spacing measurements \citep{SVV_V714}. 
+   % \item \textbf{Piezoelectric cable:} Pressure sensitive wires that generate measurable voltage proportional to applied force, detecting vehicle axles when two cables are laid transversely across the lane at fixed spacing.  They can be embedded in pavement like inductive loops or glued on surface for short-term use, enabling accurate speed, weight (WIM), axle counts, and spacing measurements \citep{SVV_V714}. 
     
-    \item \textbf{Pneumatic hoses:} Rubber hoses that are temporary detectors mounted across the road surface. When a vehicle axle passes over the tube, the generated air pulse is converted into an electrical signal in the recording unit \citep{SVV_V714}
+   % \item \textbf{Pneumatic hoses:} Rubber hoses that are temporary detectors mounted across the road surface. When a vehicle axle passes over the tube, the generated air pulse is converted into an electrical signal in the recording unit \citep{SVV_V714}
 
-\end{itemize}
+%\end{itemize}
 
-Manual and automated methods complement each other in intersection data collection. Manual counts are well suited for short-term, detailed observations during peak periods, while automated methods enable continuous monitoring and capture traffic patterns across different temporal scales \citep{SVV_V714}. In Norway, inductive loops are the most widely used detection method, followed by radar and pneumatic hoses. However, all methods have inherent strengths and limitations related to accuracy, installation, maintenance, and data type.
+%Manual and automated methods complement each other in intersection data collection. Manual counts are well suited for short-term, detailed observations during peak periods, while automated methods enable continuous monitoring and capture traffic patterns across different temporal scales \citep{SVV_V714}. In Norway, inductive loops are the most widely used detection method, followed by radar and pneumatic hoses. However, all methods have inherent strengths and limitations related to accuracy, installation, maintenance, and data type.
 
-Manual methods provide detailed snapshots for complex scenarios like intersections, while automated sensors enable continuous monitoring across temporal scales. \citep{SVV_V714} Inductive loops dominate in Norway's system, followed by radar/hoses, but all have context-specific limitations in accuracy, durability, and multimodal coverage \citep{SVV_V714}.
+%\subsubsection*{LiDAR}
+%In addition to the standardized methods described in Handbook V714, emerging sensing technologies such as LiDAR (Light Detection and Ranging) have been explored in research and pilot contexts. LiDAR is an active sensing technology capable of detecting surrounding objects with high spatial accuracy over relatively long measurement distances. During operation, the sensor emits laser pulses and records the reflected signals to generate three-dimensional point clouds representing the X, Y, and Z coordinates of objects in the environment. Unlike passive optical systems, LiDAR can operate continuously and is largely independent of ambient lighting conditions \citep{Lv2019_LiDAR}.
 
-\subsubsection*{LiDAR}
-In addition to the standardized methods described in Handbook V714, emerging sensing technologies such as LiDAR (Light Detection and Ranging) have been explored in research and pilot contexts. LiDAR is an active sensing technology capable of detecting surrounding objects with high spatial accuracy over relatively long measurement distances. During operation, the sensor emits laser pulses and records the reflected signals to generate three-dimensional point clouds representing the X, Y, and Z coordinates of objects in the environment. Unlike passive optical systems, LiDAR can operate continuously and is largely independent of ambient lighting conditions \citep{Lv2019_LiDAR}.
+%While LiDAR is not part of the Norwegian Public Roads Administration’s standard traffic counting infrastructure, it has been tested in pilot projects, including the Borealis ITS test corridor on E8 in Skibotndalen and short-term intersection trials combining mobile cameras and LiDAR for movement analysis in urban environments \citep{SVV_ITS_teststrekninger, SVV_2025_kryss_lidar_test}. Research studies further demonstrate that static roadside LiDAR combined with deep learning models can enable detailed scene understanding and road user classification in intersection settings \citep{LiDAR_IEEE}.
 
-While LiDAR is not part of the Norwegian Public Roads Administration’s standard traffic counting infrastructure, it has been tested in pilot projects, including the Borealis ITS test corridor on E8 in Skibotndalen and short-term intersection trials combining mobile cameras and LiDAR for movement analysis in urban environments \citep{SVV_ITS_teststrekninger, SVV_2025_kryss_lidar_test}. Research studies further demonstrate that static roadside LiDAR combined with deep learning models can enable detailed scene understanding and road user classification in intersection settings \citep{LiDAR_IEEE}.
+%\subsection{Limitations of Current Methods}
+%\label{sec:limitations_methods}
+%While Handbook V714 establishes comprehensive standards for traffic data collection in the Norwegian Public Roads Administration (SVV), current methods, both manual and automated, have significant limitations for detailed intersection monitoring \citep{SVV_V714}.
 
-\subsection{Limitations of Current Methods}
-\label{sec:limitations_methods}
-While Handbook V714 establishes comprehensive standards for traffic data collection in the Norwegian Public Roads Administration (SVV), current methods, both manual and automated, have significant limitations for detailed intersection monitoring \citep{SVV_V714}.
+%\subsection*{Manual Traffic Counts}
+%Manual traffic counting can provide high accuracy for specific parameters under controlled conditions, but it faces fundamental limitations that restrict its applicability. Observation periods are typically constrained to 1–4 hours \citep{SVV_V714}, preventing the capture of temporal variations across different times of day, days of the week, or seasonal patterns. Such variations are essential for comprehensive intersection analysis and design. 
 
-\subsection*{Manual Traffic Counts}
-Manual traffic counting can provide high accuracy for specific parameters under controlled conditions, but it faces fundamental limitations that restrict its applicability. Observation periods are typically constrained to 1–4 hours \citep{SVV_V714}, preventing the capture of temporal variations across different times of day, days of the week, or seasonal patterns. Such variations are essential for comprehensive intersection analysis and design. 
+%In addition, manual counting is labor-intensive and therefore economically demanding. The method is also prone to human error, particularly in complex traffic environments with high volumes or multiple turning movements. As a result, manual counts primarily provide short-term snapshots rather than continuous, behavioral datasets.
 
-In addition, manual counting is labour-intensive and therefore economically demanding. The method is also prone to human error, particularly in complex traffic environments with high volumes or multiple turning movements. As a result, manual counts primarily provide short-term snapshots rather than continuous, behavioural datasets.
+%\subsection*{Automated Traffic Counts}
 
-\subsection*{Automated Traffic Counts}
+%\textbf{Inductive loop detectors} generally provide high accuracy for traffic volume measurements under normal operating conditions \citep{SVV_V714}. However, in low-speed situations such as congestion or queuing, vehicles stopping or moving slowly over the loop may lead to underestimation or misclassification. The embedded installation in the pavement makes the system vulnerable to external factors. In Norwegian conditions, winter maintenance operations, including road milling and snow removal, can damage the loops, resulting in costly repairs and temporary data loss. Furthermore, inductive loops primarily measure aggregated vehicle parameters at fixed points and provide limited classification detail.
 
-\textbf{Inductive loop detectors} generally provide high accuracy for traffic volume measurements under normal operating conditions \citep{SVV_V714}. However, in low-speed situations such as congestion or queuing, vehicles stopping or moving slowly over the loop may lead to underestimation or misclassification. The embedded installation in the pavement makes the system vulnerable to external factors. In Norwegian conditions, winter maintenance operations, including road milling and snow removal, can damage the loops, resulting in costly repairs and temporary data loss. Furthermore, inductive loops primarily measure aggregated vehicle parameters at fixed points and provide limited classification detail.
+%\textbf{Radar sensors} are used to measure traffic volume and speed in both directions of travel \citep{SVV_V714}. In high density traffic, overlapping targets and signal interference may reduce detection accuracy. Although radar systems can support vehicle classification, performance depends heavily on calibration and environmental conditions, and classification capabilities are therefore limited in practice. Radar sensors must also be carefully positioned to avoid queue areas near intersections, where standing or slow-moving vehicles may affect measurement reliability. While radar technology can technically detect pedestrians and cyclists, such applications are rarely implemented in operational traffic monitoring.
 
-\textbf{Radar sensors} are used to measure traffic volume and speed in both directions of travel \citep{SVV_V714}. In high density traffic, overlapping targets and signal interference may reduce detection accuracy. Although radar systems can support vehicle classification, performance depends heavily on calibration and environmental conditions, and classification capabilities are therefore limited in practice. Radar sensors must also be carefully positioned to avoid queue areas near intersections, where standing or slow-moving vehicles may affect measurement reliability. While radar technology can technically detect pedestrians and cyclists, such applications are rarely implemented in operational traffic monitoring.
+%\textbf{Piezoelectric cables} are primarily used for short-term applications, typically lasting only a few days due to their installation method. The cables are exposed to mechanical wear and generally do not function reliably for extended periods. Winter conditions further reduce measurement reliability, and maintenance operations such as snow plowing increase the risk of damage. Installation and removal often require temporary road closure, leading to operational disruptions.
 
-\textbf{Piezoelectric cables} are primarily used for short-term applications, typically lasting only a few days due to their installation method. The cables are exposed to mechanical wear and generally do not function reliably for extended periods. Winter conditions further reduce measurement reliability, and maintenance operations such as snow plowing increase the risk of damage. Installation and removal often require temporary road closure, leading to operational disruptions.
+%\textbf{Pneumatic road tubes} are relatively simple and cost-effective but have several limitations. When a single tube is installed, the system registers axle counts rather than individual vehicles, which may result in overestimation of traffic volumes for heavy vehicles. With two tubes, additional parameters such as speed and direction can be derived; however, the method remains suitable only for short-term measurements due to rapid wear and vulnerability to winter conditions. As with piezoelectric cables, installation typically requires temporary road closure.
 
-\textbf{Pneumatic road tubes} are relatively simple and cost-effective but have several limitations. When a single tube is installed, the system registers axle counts rather than individual vehicles, which may result in overestimation of traffic volumes for heavy vehicles. With two tubes, additional parameters such as speed and direction can be derived; however, the method remains suitable only for short-term measurements due to rapid wear and vulnerability to winter conditions. As with piezoelectric cables, installation typically requires temporary road closure.
+%\subsubsection*{Overall Limitations}
 
-\subsubsection*{Overall Limitations}
+%Overall, traditional traffic data collection methods are primarily designed to measure aggregated vehicle-based parameters at fixed points. While they provide reliable traffic volumes and speed estimates, they offer limited insight into spatial traffic dynamics, turning trajectories, multimodal interactions, and behavioral patterns at intersections. Detection of pedestrians and cyclists is either limited or not operationally implemented, and interaction-based safety indicators cannot be derived from conventional sensor data. 
 
-Overall, traditional traffic data collection methods are primarily designed to measure aggregated vehicle-based parameters at fixed points. While they provide reliable traffic volumes and speed estimates, they offer limited insight into spatial traffic dynamics, turning trajectories, multimodal interactions, and behavioural patterns at intersections. Detection of pedestrians and cyclists is either limited or not operationally implemented, and interaction-based safety indicators cannot be derived from conventional sensor data. 
+%As a consequence, important aspects of intersection performance and safety remain largely unobserved in existing traffic datasets. This structural gap motivates the investigation of AI-based computer vision methods, which may enable automated and scalable extraction of detailed traffic metrics from existing camera infrastructure.
 
-As a consequence, important aspects of intersection performance and safety remain largely unobserved in existing traffic datasets. This structural gap motivates the investigation of AI-based computer vision methods, which may enable automated and scalable extraction of detailed traffic metrics from existing camera infrastructure.
 
+\section{Traffic Data Collection Methods and Limitations}
+\label{sec:traffic_data_collection_methods}
+\subsubsection{Manual Traffic Counts}
+Manual counts involve personnel recording data on forms or digital devices such as PDAs and laptops \citep{SVV_V714}. They are well suited to detailed, short-term observations, typically lasting 1--4 hours during peak periods, and can capture turning movements and multimodal data with high accuracy. However, the method is labor-intensive and prone to human error, particularly in complex environments with high volumes or multiple turning movements. Capturing full temporal variation across times of day, days of the week, and seasons is prohibitively costly, meaning manual counts provide short-term snapshots rather than continuous behavioral datasets \citep{SVV_V714}.
+
+\subsubsection{Automated Traffic Counts}
+
+\textbf{Inductive loop detectors} consist of insulated wire loops installed in saw-cut slots in the pavement. When a vehicle passes over, its metal mass disturbs the electromagnetic field, registering a detection event \citep{SVV_V714}. They generally provide high accuracy for traffic volume under normal conditions, but vehicles stopping or moving slowly over the loop during congestion may cause underestimation or misclassification. The embedded installation makes loops vulnerable to winter maintenance operations such as road milling and snow removal, resulting in costly repairs and temporary data loss. They also provide limited vehicle classification detail.
+
+\textbf{Radar sensors} employ the Doppler effect to detect vehicle speed and direction by transmitting pulses and analyzing the frequency shift in reflected signals \citep{SVV_V714}. In high-density traffic, overlapping targets and signal interference can reduce accuracy. Classification capabilities are limited in practice and depend heavily on calibration. Sensors must be carefully positioned to avoid queue areas near intersections, and while radar can technically detect pedestrians and cyclists, such applications are rarely implemented operationally.
+
+\textbf{Piezoelectric cables} are pressure-sensitive wires laid transversely across lanes that generate a voltage proportional to applied force, enabling axle counts, speed, weight, and spacing measurements \citep{SVV_V714}. They are primarily suited to short-term deployments of only a few days, as the cables are exposed to mechanical wear and degrade quickly. Winter conditions and snow plowing increase the risk of damage, and installation typically requires temporary road closure.
+
+\textbf{Pneumatic road tubes} are rubber hoses mounted temporarily across the road surface, converting axle-generated air pulses into electrical signals \citep{SVV_V714}. A single tube registers axle counts rather than individual vehicles, which can overestimate volumes for heavy vehicles. Two tubes allow speed and direction to be derived, but the method remains limited to short-term use due to rapid wear and vulnerability to winter conditions, with installation again requiring temporary road closure.
+
+\subsubsection{LiDAR}
+LiDAR (Light Detection and Ranging) is an active sensing technology that emits laser pulses and records reflected signals to generate three-dimensional point clouds representing the surrounding environment. Unlike passive optical systems, it operates continuously and is largely independent of ambient lighting conditions \citep{Lv2019_LiDAR}. While not part of the Norwegian Public Roads Administration's standard counting infrastructure, LiDAR has been tested in pilot projects, including the Borealis ITS test corridor on E8 in Skibotndalen and short-term intersection trials combining mobile cameras and LiDAR for movement analysis \citep{SVV_ITS_teststrekninger, SVV_2025_kryss_lidar_test}. Research further demonstrates that static roadside LiDAR combined with deep learning can enable detailed scene understanding and road user classification at intersections \citep{LiDAR_IEEE}. However, LiDAR hardware remains costly, and point cloud processing pipelines are computationally demanding, limiting widespread operational deployment.
+
+\subsubsection{Overall Limitations}
+Traditional traffic data collection methods are primarily designed to measure aggregated vehicle parameters at fixed points. While they provide reliable volume and speed estimates, they offer limited insight into spatial traffic dynamics, turning trajectories, multimodal interactions, and behavioral patterns at intersections. The detection of pedestrians and cyclists is either limited or not operationally implemented, and interaction-based safety indicators cannot be derived from conventional sensor data. This structural gap motivates the investigation of AI-based computer vision methods, which may enable automated and scalable extraction of detailed traffic metrics from existing camera infrastructure.
 
 \subsection{International Practice}
 \label{sec:international_practice}
 Internationally, Germany provides a well-documented example of formal approval regimes for automated traffic counting and vehicle classification. Systems such as the TOPO platform are certified by the Federal Highway Research Institute (BASt) and are based on non-intrusive sensor technologies, including radar and LiDAR, rather than video-based deep learning. These systems classify vehicles according to classes defined in German technical specifications and are approved for use in official traffic counting \citep{RTBGmbHCoKG2019}.
 
-In the United States, traffic data collection relies on a mix of technologies with limited use of video-based systems. Historically, traditional video image detection (VID) systems have been capable of collecting and analysing standard traffic data, but with important limitations: their classification ability is largely restricted to daylight operation, and they typically only support three to five length-based vehicle classes, making them unsuitable for axle-based schemes such as required by the FHWA \citep{FHWA2014VID}. Recent guidance from the Washington State Department of Transportation indicates that inductive loops and pneumatic tubes remain the dominant technologies for traffic counting and vehicle classification, with video not established as a standard method \citep{WSDOT2024}. At the same time, some local authorities are beginning to apply artificial intelligence to existing CCTV infrastructure for traffic and pedestrian monitoring, demonstrating a potential pathway for cost-effective use of computer vision without new sensor deployments \citep{ITSKRSComputerVisionCCTV}
+In the United States, traffic data collection relies on a mix of technologies with limited use of video-based systems. Historically, traditional video image detection (VID) systems have been capable of collecting and analyzing standard traffic data, but with important limitations: their classification ability is largely restricted to daylight operation, and they typically only support three to five length-based vehicle classes, making them unsuitable for axle-based schemes such as those required by the FHWA \citep{FHWA2014VID}. Recent guidance from the Washington State Department of Transportation indicates that inductive loops and pneumatic tubes remain the dominant technologies for traffic counting and vehicle classification, with video not established as a standard method \citep{WSDOT2024}. At the same time, some local authorities are beginning to apply artificial intelligence to existing CCTV infrastructure for traffic and pedestrian monitoring, demonstrating a potential pathway for cost-effective use of computer vision without new sensor deployments \citep{ITSKRSComputerVisionCCTV}
 
 In the UK, local authorities have documented the operational use of video-based traffic sensors combined with artificial intelligence. Cambridgeshire County Council reports the deployment of Vivacity sensors to collect classified traffic flow data for transport planning and decision-making, using AI applied to video to count and classify vehicles, pedestrians, and cyclists \citep{VivacityValidation2022}. 
 
@@ -114,6 +133,7 @@ These examples indicate that while video-based and AI-enabled systems are increa
 
 \section{Deep Learning and Computer Vision}
 \label{sec:computer_vision}
+This section introduces the deep learning and computer vision concepts underpinning the detection and tracking pipeline developed in this thesis, covering convolutional neural networks, object detection architectures, YOLO-based models, and multi-object tracking.
 
 \subsection{Theoretical Foundations of Machine Learning and Computer Vision}
 \label{sec:ml_cv}
@@ -122,7 +142,7 @@ Machine learning (ML) is a subfield of artificial intelligence in which algorith
 
 Recent advances in deep learning have substantially improved the robustness of computer vision systems to real-world variability in illumination, viewpoint, and occlusion, by learning hierarchical feature representations from large-scale image datasets \citep{LeCun2015}. These properties are particularly relevant for traffic monitoring in complex outdoor environments, where conditions change continuously and manual data collection is both costly and inconsistent.
 
-Vision-based analysis tasks are commonly categorised into three progressively more complex problem types, each building on the previous, as illustrated in \autoref{fig:Classification}. \textbf{Image classification} assigns a single semantic label to an entire image but provides no spatial information about object location \citep{Krizhevsky2012}. \textbf{Object detection} extends this by simultaneously identifying object categories and localising each instance through bounding boxes, a capability that is essential for characterising the spatial distribution of vehicles, cyclists, and pedestrians at intersections \citep{Ma2024}. \textbf{Object tracking} further associates detections across consecutive video frames, enabling the reconstruction of object trajectories over time \citep{Bewley2016}. For intersection monitoring, tracking is the critical step that transforms frame-level detections into actionable traffic data, including turning movement counts, vehicle class distributions, and downstream conflict event identification.
+Vision-based analysis tasks are commonly categorized into three progressively more complex problem types, each building on the previous, as illustrated in \autoref{fig:Classification}. \textbf{Image classification} assigns a single semantic label to an entire image but provides no spatial information about object location \citep{Krizhevsky2012}. \textbf{Object detection} extends this by simultaneously identifying object categories and localizing each instance through bounding boxes, a capability that is essential for characterizing the spatial distribution of vehicles, cyclists, and pedestrians at intersections \citep{Ma2024}. \textbf{Object tracking} further associates detections across consecutive video frames, enabling the reconstruction of object trajectories over time \citep{Bewley2016}. For intersection monitoring, this progression is critical: detection alone cannot capture movement patterns, and it is only through tracking that frame-level observations are transformed into actionable traffic data such as turning movement counts and vehicle class distributions.
 
 \begin{figure}[H]
     \centering
@@ -134,105 +154,77 @@ Vision-based analysis tasks are commonly categorised into three progressively mo
 \subsection{Deep Learning and Convolutional Neural Networks}
 \label{sec:dl_cnn}
 
-Deep learning is a class of machine learning methods based on artificial neural networks with multiple hidden layers, enabling the learning of complex, hierarchical representations from large-scale data \citep{Goodfellow-et-al-2016}. In contrast to shallow models, deep learning architectures are particularly effective for high-dimensional inputs such as images and video, where relevant features must be extracted directly from raw pixel data rather than engineered manually.
+Deep learning is a class of machine learning methods based on artificial neural networks with multiple hidden layers, enabling the learning of complex, hierarchical representations from large-scale data \citep{Goodfellow-et-al-2016}. In contrast to shallow models, deep learning architectures are particularly effective for high-dimensional inputs such as images and video, where relevant features must be extracted directly from raw pixel data.
 
-Convolutional neural networks (CNNs) represent the foundational deep learning architecture for computer vision. CNNs exploit the spatial structure of image data through convolutional layers, which apply learnable filters organized into filter banks. These filters are trained and applied across the entire input, whether the original image or the output from a previous layer, by operating on local patches, typically in sizes such as 3×3 or 5×5 pixels. Because the local statistics of images are invariant to location, all units in a feature map share the same filter bank, enabling the network to detect the same local motifs and patterns regardless of their position in the image \citep{LeCun2015}. To enable the modelling of complex decision boundaries, these layers are combined with non-linear activation functions, most commonly the Rectified Linear Unit (ReLU) \citep{Nair2010}. As noted by \cite{LeCun2015}, these non-linear modules are essential for transforming representations into higher levels of abstraction; without multiple stages of non-linearity, the network would be unable to learn the intricate structures required for discrimination. Finally, the high-level features extracted by these layers are fed into fully connected layers, which function similarly to traditional neural networks by connecting every neuron to all neurons in adjacent layers to produce the final classification output \citep{OSheaNash2015}.
+Convolutional neural networks (CNNs) represent the foundational deep learning architecture for computer vision. CNNs exploit the spatial structure of image data through convolutional layers, which apply learnable filters to local patches of the input, typically of size 3$\times$3 or 5$\times$5 pixels. Because the local statistics of images are invariant to location, all units in a feature map share the same filters, enabling the network to detect the same patterns regardless of their position in the image \citep{LeCun2015}.
+
+To model complex decision boundaries, convolutional layers are combined with non-linear activation functions, most commonly the Rectified Linear Unit (ReLU) \citep{Nair2010}. Without multiple stages of non-linearity, the network would collapse into a linear model and be unable to learn the hierarchical representations required for visual discrimination \citep{LeCun2015}. Pooling layers are inserted between convolutional blocks to progressively downsample the spatial dimensions of feature maps, reducing computational cost in later layers \citep{OSheaNash2015}.
+
+Finally, the high-level features produced by the convolutional and pooling layers are passed to fully connected layers, which aggregate these representations and produce the final classification output \citep{OSheaNash2015}. Together, these components form a hierarchical pipeline in which early layers capture low-level features such as edges and textures, while deeper layers encode increasingly abstract semantic concepts relevant to the classification task, as illustrated in \autoref{fig:CNN}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{images/CNN.png}
-    \caption[Example of a Convolutional Neural Network architecture.]{Example of a Convolutional Neural Network architecture, designed to classify hand-written digits from the MNIST dataset \citep{OSheaNash2015}.}
+    \includegraphics[width=1\linewidth]{project/images/CNN2.png}
+    \caption{Example of a Convolutional Neural Network architecture.}
     \label{fig:CNN}
 \end{figure}
 
-As network depth increases, CNNs learn progressively more abstract representations. Early layers capture low-level features such as edges and corners, while deeper layers encode higher-level semantic concepts such as object parts and complete object categories \citep{Krizhevsky2012}. This hierarchical feature learning is well suited to traffic scene analysis, where the model must simultaneously distinguish between visually similar object classes, including cars, heavy vehicles, cyclists, and pedestrians, under varying lighting conditions, viewpoints, and degrees of occlusion.
+%As network depth increases, CNNs learn progressively more abstract representations. Early layers capture low-level features such as edges and corners, while deeper layers encode higher-level semantic concepts such as object parts and complete object categories \citep{Krizhevsky2012}. This hierarchical feature learning is well suited to traffic scene analysis, where the model must simultaneously distinguish between visually similar object classes, including cars, heavy vehicles, cyclists, and pedestrians, under varying lighting conditions, viewpoints, and degrees of occlusion.
+
+This hierarchical feature learning is well suited to traffic scene analysis, where the model must simultaneously distinguish between visually similar object classes, under varying lighting conditions, viewpoints, and degrees of occlusion \citep{Krizhevsky2012}.
 
 \subsection{Object Detection Architectures}
 \label{sec:object_detection}
 
-Object detection is a core computer vision task that integrates image classification, identifying the category of an object, with spatial localisation, determining its position within the image through bounding box regression \citep{Zhao2019}. For traffic monitoring applications, this dual capability is essential: detected road users must be assigned precise spatial positions to enable downstream trajectory estimation and traffic flow analysis.
+Object detection is a core computer vision task that integrates image classification, identifying the category of an object, with spatial localization, determining its position within the image through bounding box regression \citep{Zhao2019}. For traffic monitoring applications, this dual capability is essential: detected road users must be assigned precise spatial positions to enable downstream trajectory estimation and traffic flow analysis.
 
-Deep learning object detection models are commonly categorised into two paradigms based on their localisation strategy: two-stage and one-stage detectors.
+Deep learning object detection models are commonly categorized into two paradigms based on their localization strategy: two-stage and one-stage detectors.
 
 \subsubsection{Two-Stage Object Detection}
 
-Two-stage detectors decompose the detection task into sequential steps: region proposal generation followed by per-region classification and bounding box refinement \citep{Girshick2014, Ren2015}. Candidate object regions are first generated by a Region Proposal Network (RPN), and subsequently refined in a second stage. This design yields high localisation accuracy and strong performance on small or partially occluded objects, at the cost of increased computational complexity and reduced inference speed \citep{Zhao2019}. Extensions such as Mask R-CNN further augment this paradigm with instance-level segmentation capabilities \citep{He2017}, broadening the range of spatial analysis tasks that can be performed. However, the multi-stage pipeline renders two-stage detectors generally unsuitable for applications requiring continuous high-throughput video processing.
+Two-stage detectors decompose the detection task into sequential steps: region proposal generation followed by per-region classification and bounding box refinement \citep{Girshick2014, Ren2015}. Candidate object regions are first generated by a Region Proposal Network (RPN), and subsequently refined in a second stage. This design yields high localization accuracy and strong performance on small or partially occluded objects, at the cost of increased computational complexity and reduced inference speed \citep{Zhao2019}. Extensions such as Mask R-CNN further augment this paradigm with instance-level segmentation capabilities \citep{He2017}, broadening the range of spatial analysis tasks that can be performed. However, the multi-stage pipeline makes two-stage detectors generally unsuitable for continuous video processing where real-time throughput is required.
 
 \subsubsection{One-Stage Object Detection}
 
-One-stage detectors formulate detection as a single unified regression and classification problem, performing bounding box prediction and object categorisation simultaneously across the image in a single forward pass \citep{Redmon2016, Liu2016}. The elimination of the region proposal stage results in substantially lower inference latency and higher processing throughput, making one-stage architectures well suited for real-time video analysis. Early one-stage models exhibited reduced localisation accuracy relative to two-stage approaches, particularly for small or densely clustered objects \citep{Zhao2019}. However, successive architectural advances, including feature pyramid networks, anchor-free regression heads, and attention mechanisms, have substantially narrowed this performance gap \citep{Bochkovskiy2020}, making modern one-stage detectors competitive with two-stage models across standard detection benchmarks.
+One-stage detectors formulate detection as a single unified regression and classification problem, performing bounding box prediction and object categorization simultaneously across the image in a single forward pass \citep{Redmon2016, Liu2016}. The elimination of the region proposal stage results in substantially lower inference latency and higher processing throughput, making one-stage architectures well suited for real-time video analysis. Early one-stage models exhibited reduced localization accuracy relative to two-stage approaches, particularly for small or densely clustered objects \citep{Zhao2019}. However, successive architectural advances, including feature pyramid networks, anchor-free regression heads, and attention mechanisms, have substantially narrowed this performance gap \citep{Bochkovskiy2020}, making modern one-stage detectors competitive with two-stage models across standard detection benchmarks.
 
 \subsubsection{Comparative Summary}
 
 \begin{table}[H]
 \centering
+\caption[Comparison of one-stage and two-stage object detection paradigms]{Comparison of one-stage and two-stage object detection paradigms \citep{Ma2024}.}
 \begin{tabular}{p{3.5cm} p{5cm} p{5cm}}
 \toprule
-\textbf{Aspect} & \textbf{Two-stage detectors} & \textbf{One-stage detectors} \\
+\textbf{Aspect} & \textbf{Two-stage detectors} & \textbf{One-stage detectors} \\\\
 \midrule
-Detection strategy & Region proposals + classification & Direct detection (single stage) \\
-\addlinespace
-Pipeline complexity & High & Moderate \\
-\addlinespace
-Inference speed & Slow & Fast (real-time capable) \\
-\addlinespace
-Detection accuracy & Very high & High (improving) \\
-\addlinespace
-Small object handling & Strong & Moderate to strong \\
-\addlinespace
-Computational cost & High & Lower \\
-\addlinespace
-Real-time suitability & Limited & Well suited \\
-\addlinespace
-Representative models & Faster R-CNN, Mask R-CNN & YOLO, SSD, RetinaNet \\
+Detection strategy & Region proposals + \newline classification & Direct regression and \newline classification \\\\
+Pipeline complexity & High & Moderate \\\\
+Inference speed & Slow & Fast \\\\
+Detection accuracy & Very high & High \\\\
+Small object \newline handling & Strong & Moderate to strong \\\\
+Computational cost & High & Low \\\\
+Real-time \newline suitability & Limited & Well suited \\\\
+Representative models & Faster R-CNN \newline Mask R-CNN & YOLO, SSD, RetinaNet \\\\
 \bottomrule
 \end{tabular}
-\caption[Comparison of one-stage and two-stage object detection paradigms]{Comparison of one-stage and two-stage object detection paradigms \citep{Ma2024}.}
 \label{tab:one_vs_two_stage}
 \end{table}
 
-As summarised in \autoref{tab:one_vs_two_stage}, one-stage detectors offer a more favourable trade-off between detection accuracy and computational efficiency for real-time traffic monitoring applications. Given the requirement for continuous video processing at practical frame rates and the need for downstream multi-object tracking, one-stage architectures represent the appropriate methodological basis for the detection pipeline developed in this thesis.
+As summarized in \autoref{tab:one_vs_two_stage}, one-stage detectors offer a more favorable trade-off between detection accuracy and computational efficiency for real-time traffic monitoring applications. Given the requirement for continuous video processing at practical frame rates and the need for downstream multi-object tracking, one-stage architectures represent the appropriate methodological basis for the detection pipeline developed in this thesis.
 
 \subsection{YOLO-Based Object Detection}
 \label{sec:yolo_models}
 
-The You Only Look Once (YOLO) family of models represents the most widely 
-adopted class of one-stage object detectors. YOLO models perform object 
-localisation and classification in a single forward pass of a convolutional 
-neural network, directly predicting bounding box coordinates and class 
-probabilities across the full image without an intermediate region proposal 
-stage \citep{Redmon2016}. A defining characteristic of the framework is it's 
-emphasis on global image reasoning: rather than processing candidate regions 
-independently, YOLO considers the full image context during detection, which 
-contributes to both fast inference and reduced false positives in visually 
-complex scenes. This design enables end-to-end training and real-time 
-inference, making YOLO-based models particularly well suited for continuous 
-video processing applications.
+The You Only Look Once (YOLO) family of models represents the most widely adopted class of one-stage object detectors. A defining characteristic of the framework is its emphasis on global image reasoning: rather than processing candidate regions independently, YOLO considers the full image context during detection, contributing to reduced false positives in visually complex scenes \citep{Redmon2016}. This design enables end-to-end training and real-time inference, making YOLO-based models particularly well suited for continuous video processing applications.
 
-Since its introduction in 2016, the YOLO family has undergone continuous 
-architectural development, as illustrated in \autoref{fig:yolo_timeline}, 
-with the most recent model in the Ultralytics ecosystem being YOLO26, 
-released in 2025 \citep{Sapkota2025YOLOReview}. Key advances include the 
-introduction of anchor boxes to improve localisation stability (YOLOv2), 
-multi-scale feature prediction to enable detection across a range of object 
-sizes (YOLOv3), and improved feature aggregation and training strategies to 
-strengthen the speed-accuracy trade-off (YOLOv4) \citep{Sapkota2025YOLOReview}. 
-Later generations introduced anchor-free detection heads and decoupled 
-classification and regression branches (YOLOv8), as well as end-to-end 
-optimisation with reduced post-processing overhead in more recent variants 
-\citep{Sapkota2025YOLOReview}. Collectively, these developments reflect a 
-consistent progression toward improved multi-scale detection, greater 
-generalisation, and more flexible deployment across a range of hardware 
-configurations.
-
-
+Since its introduction in 2016, the YOLO family has undergone continuous architectural development, as illustrated in \autoref{fig:yolo_timeline}, 
+with the most recent model in the Ultralytics ecosystem being YOLO26, released in 2026 \citep{Sapkota2025YOLOReview}. Key advances include the introduction of anchor boxes to improve localization stability (YOLOv2), multi-scale feature prediction to enable detection across a range of object sizes (YOLOv3), and improved feature aggregation and training strategies to strengthen the speed-accuracy trade-off (YOLOv4) \citep{Sapkota2025YOLOReview}. Later generations introduced anchor-free detection heads and decoupled classification and regression branches (YOLOv8), as well as end-to-end optimization with reduced post-processing overhead in more recent variants \citep{Sapkota2025YOLOReview}. Collectively, these developments reflect a consistent progression toward improved multi-scale detection, greater generalization, and more flexible deployment across a range of hardware configurations.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\linewidth]{project/images/YOLO_timeline.png}
     \caption[Timeline of YOLO model releases, 2015--2025]{Timeline of YOLO 
-    model releases, 2015--2025, including YOLO26 as the most recent 
-    Ultralytics release. Source: \cite{DecadeOfYOLO, YOLOv1-v8, 
+    model releases, 2015--2026. Source: \cite{DecadeOfYOLO, YOLOv1-v8, 
     Sapkota2025YOLOReview}.}
     \label{fig:yolo_timeline}
 \end{figure}
@@ -246,20 +238,18 @@ multi-scale detection capability of modern YOLO variants enables simultaneous
 detection of objects across a range of sizes and distances within a single 
 camera frame, which is essential when monitoring intersections where vehicles 
 of varying dimensions, cyclists, and pedestrians must all be reliably 
-identified. These characteristics make YOLO-based architectures a well-founded 
-methodological basis for the detection pipeline developed in this thesis, as 
-discussed further in \autoref{chap:methods}.
+identified.
 
-\subsection{The COCO Dataset}
-The Microsoft Common Objects in Context (COCO) dataset was introduced by \cite{COCO_dataset} as a large-scale object detection benchmark containing 328,000 images with 2.5 million labeled instances across 91 object categories. The dataset was later refined into the COCO 2017 version, which standardizes 80 object categories across 330,000 images with 200,000 annotated for object detection, segmentation, and captioning tasks. The dataset is split into three subsets: Train2017 (118K images), Val2017 (5K images), and Test2017 (20K images)\citep{ultralytics2024coco}. YOLO models are pre-trained on the COCO training set to leverage learned representations from diverse object categories before fine-tuning on task-specific detection tasks.
-
-\subsection{YOLO26: Key Advancements}
+\subsection{YOLO26 Key Advancements}
 \label{sec:yolo26-advancements}
-YOLO26 architectural details and initial benchmarks were first detailed in a September 2025 preprint \citep{sapkota2026yolo26keyarchitecturalenhancements}, with the full public release of models occurring in January 2026. Regarding it's distribution, the model is provided under a dual-licensing scheme: it is available under the open-source AGPL-3.0 license for researchers and open-source projects, while an Enterprise License is required for proprietary commercial applications \citep{Ultralytics2024}.
+
+YOLO26 are pre-trained on the COCO dataset (Common Objects in Context) which was introduced by \cite{COCO_dataset} as a large-scale object detection benchmark containing 328,000 images with 2.5 million labeled instances across 91 object categories. The dataset was later refined into the COCO 2017 version, which standardizes 80 object categories across 330,000 images with 200,000 annotated for object detection, segmentation, and captioning tasks. The dataset is split into three subsets: Train2017 (118K images), Val2017 (5K images), and Test2017 (20K images)\citep{ultralytics2024coco}. YOLO models are pre-trained on the COCO training set to leverage learned representations from diverse object categories before fine-tuning on task-specific detection tasks.
+
+YOLO26 architectural details and initial benchmarks were first detailed in a September 2025 preprint \citep{sapkota2026yolo26keyarchitecturalenhancements}, with the full public release of models occurring in January 2026. Regarding its distribution, the model is provided under a dual-licensing scheme: it is available under the open-source AGPL-3.0 license for researchers and open-source projects, while an Enterprise License is required for proprietary commercial applications \citep{Ultralytics2024}.
 
 A primary advancement in YOLO26 is its fully end-to-end inference pipeline that eliminates Non-Maximum Suppression (NMS) entirely. By removing this traditional post-processing step for duplicate bounding boxes, the model achieves substantially lower latency. When combined with the removal of Distribution Focal Loss (DFL), which simplifies bounding-box regression, YOLO26 delivers up to 43\% faster CPU inference compared with previous YOLO versions \citep{sapkota2026yolo26keyarchitecturalenhancements}. These changes make the architecture particularly well-suited for real-time applications on resource-constrained hardware without requiring high-end GPUs.
 
-Furthermore, YOLO26 introduces Progressive Loss Balancing (ProgLoss) and Small-Target-Aware Label Assignment (STAL) to improve training dynamics and small-object performance. ProgLoss adaptively reweights the individual loss terms throughout training, reducing the dominance of easy examples and promoting more balanced learning. STAL, in turn, gives higher priority to small or heavily occluded targets during label assignment. In the context of traffic surveillance, this noticeably enhances detection of distant or partially obscured vehicles. Finally, the novel MuSGD optimizer accelerates convergence while improving stability, which simplifies fine-tuning on custom vehicle datasets and reduces sensitivity to hyperparameter choices \citep{sapkota2026yolo26keyarchitecturalenhancements}.
+Furthermore, YOLO26 introduces Progressive Loss Balancing (ProgLoss) and Small-Target-Aware Label Assignment (STAL) to improve training dynamics and small-object performance. ProgLoss adaptively reweights the individual loss terms throughout training, reducing the dominance of easy examples and promoting more balanced learning. STAL, in turn, gives higher priority to small or heavily occluded targets during label assignment. In the context of traffic surveillance, this noticeably enhances the detection of distant or partially obscured vehicles. Finally, the novel MuSGD optimizer accelerates convergence while improving stability, which simplifies fine-tuning on custom vehicle datasets and reduces sensitivity to hyperparameter choices \citep{sapkota2026yolo26keyarchitecturalenhancements}.
 
 
 \autoref{fig:YOLO_compare_chart}  illustrates the accuracy–latency trade-off of various YOLO26 model variants compared to previous YOLO generations on the COCO dataset, plotting COCO mAP$  ^{50-95}  $ against inference latency. The YOLO26 variants (highlighted in blue) demonstrate a highly favorable position in this trade-off, offering competitive or superior accuracy at notably lower latency.
@@ -278,12 +268,12 @@ YOLO26 follows the classic single-stage, end-to-end object detection paradigm in
 The model supports five different scales (nano, small, medium, large, and extra-large) that are controlled by three scaling parameters: \texttt{depth\_multiple}, \texttt{width\_multiple}, and \texttt{max\_channels}.
 
 \subsubsection*{Backbone}
-The backbone of YOLO26 is responsible for hierarchical feature extraction from the input image (640 $\times$ 640 $\times$ 3). It consists of an initial pair of convolutional layers (kernel size 3, stride 2) that progressively reduce spatial resolution, followed by a sequence of C3k2 blocks (parameterised by \texttt{depth\_multiple}, \texttt{width\_multiple}, and \texttt{max\_channels}) interleaved with additional convolutional blocks \citep{hidayatullah2026yolo26}. The final stages include an enhanced SPPF module with a shortcut connection and a C2PSA block that incorporates self-attention for global context modelling. The last three backbone stages (P3, P4, P5) forward multi-scale feature maps to the neck.
+The backbone of YOLO26 is responsible for hierarchical feature extraction from the input image (640 $\times$ 640 $\times$ 3). It consists of an initial pair of convolutional layers (kernel size 3, stride 2) that progressively reduce spatial resolution, followed by a sequence of C3k2 blocks (parameterized by \texttt{depth\_multiple}, \texttt{width\_multiple}, and \texttt{max\_channels}) interleaved with additional convolutional blocks \citep{hidayatullah2026yolo26}. The final stages include an enhanced SPPF module with a shortcut connection and a C2PSA block that incorporates self-attention for global context modeling. The last three backbone stages (P3, P4, P5) forward multi-scale feature maps to the neck.
 
 In general, the backbone's main objective is to progressively transform the raw input image into rich, multi-scale feature representations, capturing low-level details (edges, textures) in shallow layers and high-level semantic information (object context) in deeper layers.
 
 \subsubsection*{Neck}
-The neck of YOLO26 aggregates and fuses the multi-scale feature maps produced by the backbone. It begins with the SPPF module, followed by a C2PSA attention block, then alternates between upsampling (nearest-neighbour), concatenation, and additional C3k2 blocks \citep{hidayatullah2026yolo26}. Three refined feature maps (at 80 $\times$ 80, 40 $\times$ 40, and 20 $\times$ 20 resolution) are passed forward to the head.
+The neck of YOLO26 aggregates and fuses the multi-scale feature maps produced by the backbone. It begins with the SPPF module, followed by a C2PSA attention block, then alternates between upsampling (nearest-neighbor), concatenation, and additional C3k2 blocks \citep{hidayatullah2026yolo26}. Three refined feature maps (at 80 $\times$ 80, 40 $\times$ 40, and 20 $\times$ 20 resolution) are passed forward to the head.
 
 The neck's main objective is to combine semantic information from deeper layers with fine-grained spatial details from shallower layers. This multi-scale feature combination enables the model to detect objects effectively at different sizes.
 
@@ -301,11 +291,78 @@ The head's main objective is to translate the fused multi-scale features into th
 
 \subsection{Multi-Object Tracking and Trajectory Extraction}
 \label{sec:multi_object_tracking}
-Measuring traffic parameters such as turning movements requires more than object detection alone; it necessitates Multi-Object Tracking (MOT). MOT assigns a persistent and unique identifier to each detected road user across consecutive video frames, enabling trajectory estimation and movement analysis \citep{Hassan2024}.
 
-In practice, most MOT systems follow a detection-based tracking paradigm, where per-frame object detections are linked over time using a combination of motion modelling and data association \citep{yang2022videoobjecttrackingbased}. Motion modelling is commonly handled using a Kalman filter, while association between existing tracks and new detections is typically solved using an assignment algorithm (e.g., Hungarian matching) based on geometric overlap (IoU) and/or detection confidence. 
+Measuring traffic parameters such as turning movements requires more than 
+object detection alone; it necessitates Multi-Object Tracking (MOT). MOT 
+assigns a persistent and unique identifier to each detected road user across 
+consecutive video frames, enabling trajectory estimation and movement 
+analysis \citep{Hassan2024}. In practice, most MOT systems follow a 
+tracking-by-detection paradigm, where per-frame detections are linked over 
+time using a combination of motion modeling and data association 
+\citep{yang2022videoobjecttrackingbased}. The two core components underlying 
+this paradigm are Kalman filtering for motion prediction and the Hungarian 
+algorithm for optimal detection-to-track assignment. Modern trackers such as 
+ByteTrack and BoT-SORT build on this foundation with more robust association 
+strategies.
 
-Modern trackers such as ByteTrack and BoT-SORT extend this pipeline with more robust association strategies. In particular, BoT-SORT can incorporate appearance cues through re-identification (ReID) features to recover identities after missed detections or short-term occlusions. However, appearance-based ReID may degrade under strong visual artifacts (e.g., blur/pixelation) and prolonged occlusions, which are common in real-world traffic video. 
+\subsubsection*{Kalman Filtering}
+
+The Kalman filter is a recursive estimator that predicts and refines the 
+state of a dynamic system over time under noisy observations and process 
+uncertainty \citep{Kalman1960}. In the MOT context, each active tracklet 
+maintains a state vector encoding its bounding box position, size, and 
+velocity. The filter operates in two alternating steps per frame. First, 
+in the \emph{prediction} step, the filter extrapolates the tracklet's 
+current state forward using a constant-velocity motion model, producing an 
+estimated position and an associated uncertainty. Second, in the 
+\emph{update} step, this prediction is refined using the matched detection 
+as a measurement; the Kalman gain determines how much weight is placed on 
+the prediction relative to the observation \citep{WelchBishop2006}. 
+Together, these steps allow the tracker to anticipate object positions 
+between frames, handle brief missed detections, and reduce noise in 
+bounding box estimates.
+
+\subsubsection*{Hungarian Matching}
+
+Given a set of predicted tracklet positions and a set of new detections, 
+the data association problem reduces to finding the optimal one-to-one 
+assignment between the two sets. This is solved by the Hungarian algorithm 
+\citep{Kuhn1955, Munkres1957}, which finds the minimum-cost assignment 
+efficiently. The cost matrix is typically constructed from Intersection 
+over Union (IoU) between predicted and detected bounding boxes, so that 
+spatially consistent pairs receive low cost. This combination of Kalman 
+filtering and Hungarian matching was first applied to online tracking by 
+\citet{Bewley2016}, in the SORT framework, and forms the foundation that most subsequent trackers build upon.
+
+\subsubsection*{ByteTrack}
+
+ByteTrack is an online tracking-by-detection method that improves robustness 
+to missed detections by explicitly incorporating \emph{low-confidence} 
+detections into the association process \citep{Zhang2021ByteTrack}. Instead 
+of discarding detections below a fixed confidence threshold, ByteTrack 
+performs a two-stage matching procedure. In the first stage, high-confidence 
+detections are associated with existing tracklets using Kalman-predicted 
+positions and IoU-based Hungarian assignment. In the second stage, any 
+remaining unmatched tracklets are matched against lower-confidence detections, 
+allowing partially occluded or blurred objects to be recovered when their 
+detector score temporarily drops. By treating low-score boxes as potentially 
+informative rather than noise, ByteTrack reduces trajectory fragmentation 
+and improves identity continuity under partial occlusion or low visibility 
+conditions.
+
+\subsubsection*{BoT-SORT}
+
+BoT-SORT extends the SORT framework by strengthening both motion modeling 
+and data association \citep{Aharon2022BoTSORT}. It retains the standard 
+online tracking loop (Kalman prediction, Hungarian assignment, track 
+management) but introduces an enhanced Kalman filter state representation 
+for more accurate bounding box prediction. In its full configuration 
+(BoT-SORT-ReID), the Hungarian cost matrix is augmented with 
+appearance-based re-identification (ReID) embeddings, which can improve 
+identity preservation when geometric cues are ambiguous. However, the 
+benefit of ReID depends on stable visual appearance and may diminish under 
+strong illumination changes, motion blur, or privacy-masking artifacts 
+common in real-world traffic video.
 
 \section{Performance Evaluation Metrics}
 \label{sec:evaluation_metrics}
@@ -347,28 +404,41 @@ While the AP measures the performance for single class, Mean Average Precision (
 mAP = \frac{1}{N} \sum_{i=1}^{N} AP_i
 \end{equation}
 
-The literature commonly reports two versions of mAP to provide a complete picture of model performance. The mAP$^{50}$ represents the mAP calculated at a fixed IoU treshold of 0.5. This means that a detection is labeled as a True Positive if the overlap between the predicted box and the GT box is minimum 50\%. Instead of using a single treshold, mAP$^{50-95}$ uses the average of mAP values calculated at ten different IoU tresholds from 0.5 to 0.95, in 0.05 increments. This metric rewards models for superior localization accuracy.
+The literature commonly reports two versions of mAP to provide a complete picture of model performance. The mAP$^{50}$ represents the mAP calculated at a fixed IoU threshold of 0.5. This means that a detection is labeled as a True Positive if the overlap between the predicted box and the GT box is at least 50\%. Instead of using a single threshold, mAP$^{50-95}$ uses the average of mAP values calculated at ten different IoU thresholds from 0.5 to 0.95, in 0.05 increments. This metric rewards models for superior localization accuracy.
 
 \subsection*{MOT Evaluation Metrics}
-Standard multi-object tracking metrics such as Multiple Object Tracking Accuracy (MOTA), Multiple Object Tracking Precision (MOTP), and IDF1 penalise detection misses, false positives, localisation errors, and identity switches, making them well-suited for evaluating trajectory continuity in general MOT tasks \citep{JIMENEZBRAVO202243}. However, these metrics require dense frame-by-frame identity annotations across thousands of frames, which is extremely time-consuming and impractical. 
+\label{evaluation_metrics}
 
-Instead, we evaluated the detection + tracking pipelines using task-specific metrics based on manually annotated ground-truth Origin–Destination (O–D) matrices. Performance is measured using:
+Standard MOT metrics such as MOTA, MOTP, and IDF1 penalize detection misses, false positives, localization errors, and identity switches \citep{JIMENEZBRAVO202243}. However, they require dense frame-by-frame identity annotations, making them impractical when analyzing thousands of frames. Instead, we evaluate pipelines using task-specific metrics derived from manually annotated ground-truth Origin--Destination (O--D) matrices, where $\hat{S}_r$ and $S_r$ are the predicted and ground-truth total counts for route $r$, $\hat{T}_{r,c}$ and $T_{r,c}$ are the predicted and ground-truth counts for route $r$ and vehicle class $c$, and $\mathcal{R}^+$ denotes routes with $S_r > 0$.
 
-\begin{align}
-\mathrm{MAE}_{\text{cell}} &= \frac{1}{|\mathcal{R}||\mathcal{C}|} \sum_{r,c} |\hat{T}_{r,c} - T_{r,c}| \label{eq:mae_cell}\\[0.5em]
-\mathrm{MAE}_{\text{route}} &= \frac{1}{|\mathcal{R}|} \sum_{r} |\hat{S}_r - S_r| \label{eq:mae_route}\\[0.5em]
-E_{\text{total}} &= \sum_r \hat{S}_r - \sum_r S_r \label{eq:total_error}\\[0.5em]
-\%\mathrm{Err}_{\text{abs}} &= \frac{|E_{\text{total}}|}{\sum_r S_r} \cdot 100 \label{eq:pct_error}
-\end{align}
+The net signed difference between total predicted and ground-truth counts across all routes indicates systematic over- or under-counting:
+\begin{equation}
+E_{\text{total}} = \sum_r \hat{S}_r - \sum_r S_r \label{eq:total_error}
+\end{equation}
 
-where $T_{r,c}$ is the count for route $r$ and class $c$, and $S_r$ is the total count for route $r$. Additionally, $E_{\text{total}}$ measures the net prediction error across all routes, while $\%\mathrm{Err}_{\text{abs}}$ normalizes this error as a percentage of ground truth, enabling comparison across videos of different scales. Together, these metrics quantify directional accuracy (route-level), class-specific performance (cell-level), and overall counting reliability, directly measuring how accurately the pipeline reproduces final aggregated traffic movements.
+Normalising the absolute total error by the ground-truth count enables scale-invariant comparison across videos of different sizes:
+\begin{equation}
+\%\mathrm{Err}_{\text{abs}} = \frac{|E_{\text{total}}|}{\sum_r S_r} \cdot 100 \label{eq:pct_error}
+\end{equation}
+
+The mean absolute deviation across all route--class cells measures class-level counting accuracy:
+\begin{equation}
+\%\mathrm{Err}_{\text{class}} = \frac{\sum_{r,c} |\hat{T}_{r,c} - T_{r,c}|}{\sum_{r,c} T_{r,c}} \cdot 100 \label{eq:class_rel_error}
+\end{equation}
+
+The average per-route relative error across active routes captures directional counting accuracy independently of route volume:
+\begin{equation}
+\%\mathrm{Err}_{\text{route}} = \frac{1}{|\mathcal{R}^+|} \sum_{r \in \mathcal{R}^+} \frac{|\hat{S}_r - S_r|}{S_r} \cdot 100 \label{eq:route_rel_error}
+\end{equation}
+
+Together, these metrics quantify overall counting reliability, class-specific performance, and per-route directional accuracy, directly reflecting how well the pipeline reproduces aggregated traffic movements.
 
 \section{Literature Review and Research Gap}
 \label{sec:literature_review_research_gap}
 
 This section reviews prior studies on deep learning–based vehicle detection for traffic monitoring, focusing on detection performance, computational efficiency, and real-world applicability. Identified limitations in existing work form the basis for the research gap addressed in this thesis.
 
-\subsection{Deep Learning Approaches to Vehicle Detection}
+\subsection{Prior Work on Vehicle Detection and Tracking}
 \label{previous_work}
 Several studies have investigated the performance of deep learning models for vehicle detection and classification using established benchmark datasets. For example, \cite{Ma2024} evaluated multiple one-stage and two-stage detection models on the PASCAL VOC 2012 dataset, a commonly used dataset in Computer Vision \citep{Everingham10,HuggingFacePascalVOC}. Although the dataset consists of still images rather than video sequences, the authors report that some one-stage models achieve processing speeds of up to 45 frames per second, but with lower detection accuracy compared to slower two-stage models. The study primarily formulates vehicle detection as a generic object detection task, and the number of vehicle classes used for classification is not explicitly specified.
 
@@ -385,11 +455,15 @@ Several studies have investigated the performance of deep learning models for ve
 
 \subsection{Knowledge Gaps and Steps for Further Research}
 \label{sec:research_gap}
-\cite{Maity2022LastDecadeVehicleDetection} present a comprehensive survey of machine learning and deep learning–based approaches for automatic vehicle detection (AVD) and classification published over the last decade. Based on their review, the authors identify several research gaps. First, many AVD studies consider only a limited number of vehicle classes, highlighting the need to include a broader range of road users to better reflect real-world traffic diversity. Second, existing approaches often fail to explicitly evaluate robustness under occlusion and dense traffic conditions, despite these being common in operational environments.
 
+\cite{Maity2022LastDecadeVehicleDetection} present a comprehensive survey of machine learning and deep learning--based approaches for automatic vehicle detection (AVD) and classification published over the last decade. Their review identifies several research gaps. In particular, they note that many studies consider only a limited number of vehicle classes, motivating broader coverage to better reflect real-world traffic diversity, and that robustness is often not explicitly evaluated under operationally common conditions such as occlusion and dense traffic.
 
-Furthermore, \cite{DeepLearningTrafficScene2025} emphasize that YOLO-based detectors still require improvements in small-object and multi-scale detection, as well as increased robustness under adverse environmental conditions such as challenging lighting and weather. In addition, \cite{YOLO-PEL} argue that future research should prioritize practical validation of deep learning–based traffic monitoring systems in real-world deployment settings to assess their operational reliability and applicability.
+Related work suggests that these limitations persist for modern YOLO-based detectors. \cite{DeepLearningTrafficScene2025} emphasize that improvements are still needed for small-object and multi-scale detection, as well as robustness under adverse environmental conditions such as challenging lighting and weather. In addition, \cite{YOLO-PEL} argue that future research should prioritize practical validation in real-world deployment settings in order to assess operational reliability and applicability.
 
-To address these identified gaps, this thesis applies a deep learning–based object detection framework to video data from fixed roadside cameras in real intersection environments. The study expands beyond standard benchmark evaluations by focusing on a broader range of traffic participants relevant to Norwegian design guidelines. Furthermore, detection performance is evaluated under realistic operational conditions, including varying lighting, traffic density, and partial occlusion.
+In the context of Multi-Object Detection (MOT), \cite{Hassan2024} conduct a systematic literature review of MOT approaches and note that future work should explore deep learning--based tracking with an emphasis on more end-to-end MOT solutions to improve robustness and accuracy in complex real-world scenarios. Additionally, the authors emphasize that future research should focus on dealing with occlusions; a frequent problem that leads to ID-switches.
 
-The extent to which these research gaps are addressed is evaluated by quantitatively comparing the automatically extracted traffic parameters (traffic volumes, vehicle composition, and turning movements) against the performance levels and limitations reported in prior studies, using accuracy metrics and error analysis. This determines whether the deep learning–based approach achieves sufficient precision and reliability for operational decision-support, while also testing its practical applicability in real-world intersection monitoring as called for in the literature.
+To address these identified gaps, this thesis applies a deep learning--based, end-to-end vision pipeline to video data from fixed roadside cameras in real intersection environments, covering the full workflow from video input to automatically extracted traffic measures. The study expands beyond standard benchmark evaluations by focusing on a broader range of traffic participants relevant to Norwegian design guidelines. Furthermore, detection performance is evaluated under realistic operational conditions, including varying lighting, traffic density, and partial occlusion, and the pipeline incorporates practical strategies to mitigate the impact of occlusions during continuous operation.
+
+The extent to which these research gaps are addressed is evaluated by quantitatively comparing the automatically extracted traffic parameters (traffic volumes, vehicle composition, and turning movements) against the performance levels and limitations reported in prior studies, using accuracy metrics and error analysis. 
+
+%This determines whether the deep learning--based approach achieves sufficient precision and reliability for operational decision-support, while also testing its practical applicability in real-world intersection monitoring as called for in the literature.

@@ -6,7 +6,7 @@ Orchestrates:
 - Frame processing and detection
 - Day/night mode detection and tracker switching
 - Zone-based counting (O-D matrix)
-- Split ID recovery across tracker switches
+- Fragmented track recovery during finalization
 - Video output with annotations
 """
 
@@ -50,6 +50,7 @@ def run_video_deploy(
     track_finalize_gap_seconds: float = 2.0,
     split_max_gap_seconds: float = 3.0,
     sat_threshold: float = 20.0,
+    tracker_hold_seconds: float = 5.0,
 ) -> Dict[str, Any]:
     """
     Deploy-optimized tracking with dynamic day/night tracker switching.
@@ -78,10 +79,11 @@ def run_video_deploy(
         zone_dwell_frames: Frames in same zone = stable
         save_video: Write output video
         max_frames: Limit processing (None = all frames)
-        enable_split_id_fallback: Post-process to recover split track IDs
+        enable_split_id_fallback: Post-process to recover fragmented track identities
         track_finalize_gap_seconds: Seconds of inactivity before finalizing track (default 2s)
-        split_max_gap_seconds: Max gap in seconds for split ID matching (default 3s)
+        split_max_gap_seconds: Max gap in seconds for fragment matching (default 3s)
         sat_threshold: HSV saturation threshold for day/night detection (< threshold = night)
+        tracker_hold_seconds: Seconds the proposed mode must persist before switching
     
     Returns:
         Dict with tracking results, counts, and metadata
@@ -132,7 +134,7 @@ def run_video_deploy(
         sat_threshold=sat_threshold,
         window=int(fps * 2)  # 2 seconds of frames
     )
-    switcher = TrackerSwitcher(initial_mode="day")
+    switcher = TrackerSwitcher(initial_mode="day", fps=fps, hold_seconds=tracker_hold_seconds)
     counter = ZoneCounter(
         gate_zones=gate_zones,
         fps=fps,

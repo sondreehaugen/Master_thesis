@@ -19,3 +19,5 @@ proximity_thresh: 0.75
 appearance_thresh: 0.35
 with_reid: False
 model: auto
+
+

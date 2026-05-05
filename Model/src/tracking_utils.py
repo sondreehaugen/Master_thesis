@@ -36,9 +36,11 @@ def setup_tracking_context(
     except ImportError:
         in_colab = False
 
+    # Build the core workspace paths used by the notebook and deployment scripts.
     runs_dir = f"{drive_base}/runs"
     model_path = f"{drive_base}/{model_name}"
     
+    # Accept either an absolute path or a known tracker file name.
     if tracker_yaml.startswith("/") or tracker_yaml in ["botsort.yaml", "bytetrack.yaml"]:
         custom_tracker = tracker_yaml
     else:

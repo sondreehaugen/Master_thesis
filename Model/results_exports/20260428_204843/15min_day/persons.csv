@@ -1,0 +1,7 @@
+model,tracker,gt_persons,predicted_persons,error,pct_error
+YOLO26n_final.pt,bytetrack,3,0,-3,100.0
+YOLO26n_final.pt,botsort,3,0,-3,100.0
+YOLO26n_final.pt,day_botsort,3,0,-3,100.0
+YOLO26m_final.pt,bytetrack,3,5,2,66.66666666666666
+YOLO26m_final.pt,botsort,3,5,2,66.66666666666666
+YOLO26m_final.pt,day_botsort,3,3,0,0.0

@@ -1,0 +1,7 @@
+,car,light truck,heavy truck,semi-trailer / combination vehicle,bus,motorcycle,bicycle,Sum
+S->N,60,0,1,6,1,0,0,68
+N->S,54,1,1,1,1,2,0,60
+E->S,2,0,0,0,0,0,0,2
+E->N,2,0,0,0,0,0,0,2
+S->E,2,0,0,0,0,0,0,2
+N->E,0,0,0,0,0,0,0,0

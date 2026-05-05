@@ -1,15 +1,15 @@
 """
 split_id_fallback.py
-Post-processing for split track ID recovery across tracker switches.
+Post-processing for fragmented track ID recovery.
 
-When tracker switches occur mid-video, the same vehicle may get different
-track IDs before and after the switch. This module recovers those matches
-based on spatial proximity, velocity prediction, and class consistency.
+When a vehicle track is fragmented into multiple identities, the fragments
+can be recovered by matching temporal continuity, spatial proximity, velocity
+prediction, and class consistency. This is useful for tracker switches, short
+occlusions, and other brief tracking interruptions.
 """
 
 from collections import defaultdict
 from typing import Dict, List, Tuple
-
 import numpy as np
 
 from .geometry import tracking_point_xyxy, point_in_polygon
@@ -17,8 +17,8 @@ from .geometry import tracking_point_xyxy, point_in_polygon
 
 class SplitIDRecovery:
     """
-    Recover split track IDs caused by tracker switches.
-    Matches fragments based on spatial distance, velocity, and class.
+    Recover fragmented track identities across brief tracking interruptions.
+    Matches fragments based on spatial distance, velocity, class, and time gap.
     """
     
     def __init__(
@@ -33,7 +33,7 @@ class SplitIDRecovery:
         max_gap_seconds: float = 3.0,
     ):
         """
-        Initialize split ID recovery.
+        Initialize fragmented track recovery.
         
         Args:
             model: YOLO model for class names
@@ -139,29 +139,40 @@ class SplitIDRecovery:
         all_tracks_by_frame: Dict,
         od_events: List[Dict],
         od_counts: Dict,
-    ) -> Dict[str, int]:
+    ) -> Dict[str, object]:
         """
-        Apply split ID recovery.
+        Apply fragmented-track recovery to O--D events and counts.
         
         Args:
             all_tracks_by_frame: {frame_idx: [(tid, box, conf, clsid, ...)]}
-            od_events: Existing O-D events
-            od_counts: Existing O-D counts (will be modified)
+            od_events: Existing O-D events.
+            od_counts: Existing O-D counts (will be modified).
         
         Returns:
-            {added_same_id: int, added_split_id: int}
+            Dictionary with aggregate counts and recovered fragment matches.
         """
         if not self.enable or not self.gate_zones or not all_tracks_by_frame:
-            return {"added_same_id": 0, "added_split_id": 0}
+            return {
+                "added_same_id": 0,
+                "added_split_id": 0,
+                "same_id_track_ids": [],
+                "split_id_matches": [],
+            }
         
         frags = self._build_fragments(all_tracks_by_frame)
         if not frags:
-            return {"added_same_id": 0, "added_split_id": 0}
+            return {
+                "added_same_id": 0,
+                "added_split_id": 0,
+                "same_id_track_ids": [],
+                "split_id_matches": [],
+            }
         
         counted_ids = set(int(e.get("track_id")) for e in od_events if "track_id" in e)
         
         # A) Same-ID missing trip (track never left origin zone before switch)
         added_same = 0
+        same_id_track_ids = []
         for f in frags:
             tid = int(f["id"])
             if tid in counted_ids:
@@ -184,6 +195,7 @@ class SplitIDRecovery:
             })
             counted_ids.add(tid)
             added_same += 1
+            same_id_track_ids.append(tid)
         
         # B) Split-ID matching (fragments before and after switch)
         min_fragment_frames = 5
@@ -205,6 +217,7 @@ class SplitIDRecovery:
         
         used_end_ids = set()
         added_split = 0
+        split_id_matches = []
         
         for a in starts:
             best = None
@@ -266,5 +279,18 @@ class SplitIDRecovery:
             used_end_ids.add(int(best["id"]))
             counted_ids.add(int(a["id"]))
             added_split += 1
+
+            split_id_matches.append({
+                "start_id": int(a["id"]),
+                "end_id": int(best["id"]),
+                "origin": a["start_zone"],
+                "dest": best["end_zone"],
+                "score": float(best_score),
+            })
         
-        return {"added_same_id": added_same, "added_split_id": added_split}
+        return {
+            "added_same_id": added_same,
+            "added_split_id": added_split,
+            "same_id_track_ids": same_id_track_ids,
+            "split_id_matches": split_id_matches,
+        }

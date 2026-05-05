@@ -1,3 +1,5 @@
+"""Ground-truth route and class counts used for evaluation and comparison."""
+
 from __future__ import annotations
 
 from copy import deepcopy
@@ -14,20 +16,10 @@ GT_BY_VIDEO = {
         "N->S": {"car": 354, "light truck": 11, "heavy truck": 11, "semi-trailer / combination vehicle": 14, "bus": 2, "motorcycle": 13, "bicycle": 2},
         "E->S": {"car": 18,  "light truck": 0,  "heavy truck": 0, "semi-trailer / combination vehicle": 0,   "bus": 0, "motorcycle": 0,  "bicycle": 0},
         "E->N": {"car": 16,  "light truck": 0,  "heavy truck": 0, "semi-trailer / combination vehicle": 0,   "bus": 0, "motorcycle": 0,  "bicycle": 1},
-        "S->E": {"car": 14,  "light truck": 0,  "heavy truck": 0, "semi-trailer / combination vehicle": 0,   "bus": 0, "motorcycle": 1,  "bicycle": 3},
+        "S->E": {"car": 18,  "light truck": 0,  "heavy truck": 0, "semi-trailer / combination vehicle": 0,   "bus": 0, "motorcycle": 1,  "bicycle": 4},
         "N->E": {"car": 10,  "light truck": 1,  "heavy truck": 0, "semi-trailer / combination vehicle": 0,   "bus": 2, "motorcycle": 0,  "bicycle": 0},
         "Gangfeltet": {"person": 7},
     },
-
-    "Fv587_Haukeland_day_diff_10min.mp4": {
-        "S->N": {"car": 88, "light truck": 3, "heavy truck": 5, "semi-trailer / combination vehicle": 3, "bus": 0, "motorcycle": 2, "bicycle": 0},
-        "N->S": {"car": 61, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 1, "bus": 1, "motorcycle": 1, "bicycle": 0},
-        "E->S": {"car": 6, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "E->N": {"car": 3, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 3},
-        "N->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "Gangfeltet": {"person": 2}
-},
 
     "Fv587_Haukeland_15min.mp4": {
         "S->N": {"car": 134, "light truck": 5, "heavy truck": 2, "semi-trailer / combination vehicle": 1, "bus": 0, "motorcycle": 1, "bicycle": 0},
@@ -38,127 +30,14 @@ GT_BY_VIDEO = {
         "N->E": {"car": 4, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
         "Gangfeltet": {"person": 3},
     },
-    "Fv587_Haukeland_3min_00.mp4": {
-        "S->N": {"car": 21, "light truck": 1, "heavy truck": 3, "semi-trailer / combination vehicle": 2, "bus": 1, "motorcycle": 1, "bicycle": 0},
-        "N->S": {"car": 14, "light truck": 1, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "S->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 1, "motorcycle": 0, "bicycle": 0},
-    },
-
-     "Fv587_Haukeland_3min_00_occlusion.mp4": {
-        "S->N": {"car": 4, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->S": {"car": 3, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        },
     
-    "Fv587_Haukeland_stortelling.mp4": {
-        "S->N": {"car": 6, "light truck": 1, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->S": {"car": 2, "light truck": 0, "heavy truck": 2, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    },
-    "Fv587_Haukeland_1229050_00.mp4": {
-        "S->N": {"car": 18, "light truck": 0, "heavy truck": 2, "semi-trailer / combination vehicle": 0, "bus": 1, "motorcycle": 0},
-        "N->S": {"car": 14, "light truck": 1, "heavy truck": 3, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->S": {"car": 2, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    },
-    "Fv587_Haukeland_1229050_01.mp4": {
-        "S->N": {"car": 21, "light truck": 2, "heavy truck": 2, "semi-trailer / combination vehicle": 1, "bus": 0, "motorcycle": 0},
-        "N->S": {"car": 13, "light truck": 0, "heavy truck": 2, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "S->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    },
-    "Fv587_Haukeland_1min_natt2.mp4": {
-    "S->N": {"car": 4, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "N->S": {"car": 4, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "N->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    },
-    "Fv587_Haukeland_1min_natttest.mp4": {
-    "S->N": {"car": 4, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 1, "motorcycle": 0},
-    "N->S": {"car": 2, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    },  
-    
-    "Fv587_Haukeland_10min_natt.mp4": {
-    "S->N": {"car": 17, "light truck": 0, "heavy truck": 1, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 1},
-    "N->S": {"car": 15, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "E->S": {"car": 3, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    "S->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 1},
-    "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-    },
-
-    "Fv587_Haukeland_pedestrians.mp4": {
-        "S->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "N->S": {"car": 3, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        "Gangfeltet": {"person": 3},
-    },					
-
     "Fv587_Haukeland_night_1h.mp4": {
-        "S->N": {"car": 60, "light truck": 0, "heavy truck": 1, "semi-trailer / combination vehicle": 4, "bus": 1, "motorcycle": 0, "bicycle": 0},
-        "N->S": {"car": 54, "light truck": 1, "heavy truck": 2, "semi-trailer / combination vehicle": 0, "bus": 1, "motorcycle": 2, "bicycle": 0},
+        "S->N": {"car": 60, "light truck": 0, "heavy truck": 1, "semi-trailer / combination vehicle": 6, "bus": 1, "motorcycle": 0, "bicycle": 0},
+        "N->S": {"car": 54, "light truck": 1, "heavy truck": 1, "semi-trailer / combination vehicle": 1, "bus": 1, "motorcycle": 2, "bicycle": 0},
         "E->S": {"car": 2, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
         "E->N": {"car": 2, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
         "S->E": {"car": 2, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
         "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        },
-    
-    "Fv587_Haukeland_natt20min.mp4": {
-            "S->N": {"car": 25, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 1, "bus": 1, "motorcycle": 0, "bicycle": 0},
-            "N->S": {"car": 18, "light truck": 1, "heavy truck": 1, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 1, "bicycle": 0},
-            "E->S": {"car": 2, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-            "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-            "S->E": {"car": 2, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-            "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0, "bicycle": 0},
-        },
-
-    "Fv587_Haukeland_1time_buss.mp4": {
-        "S->N": {"car": 13, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 1, "motorcycle": 0},
-        "N->S": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->S": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->N": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "S->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        },
-
-    "Fv587_Haukeland_day_and_night.mp4": {
-        "S->N": {"car": 17, "light truck": 0, "heavy truck": 3, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 1},
-        "N->S": {"car": 7, "light truck": 1, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->S": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->N": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "S->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 1, "motorcycle": 0},
-        },
-
-    "day_and_night_2m45s.mp4": {
-        "S->N": {"car": 4, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 2, "bus": 0, "motorcycle": 0},
-        "N->S": {"car": 7, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->S": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "E->N": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "S->E": {"car": 1, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
-        "N->E": {"car": 0, "light truck": 0, "heavy truck": 0, "semi-trailer / combination vehicle": 0, "bus": 0, "motorcycle": 0},
         },
 
     "Fv587_Haukeland_10min_transition.mp4": {

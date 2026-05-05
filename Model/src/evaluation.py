@@ -1,16 +1,14 @@
+"""Evaluation utilities for comparing predicted and ground-truth O-D results."""
+
 from __future__ import annotations
-
-import inspect
-from pathlib import Path
-import pickle
-
 import numpy as np
 import pandas as pd
 
 from src.GT import CLASS_ORDER, FLOW_ORDER
 
-
 def map_class_name(name: str) -> str | None:
+    """Map model-specific class labels to the thesis class taxonomy."""
+
     n = str(name).strip().lower()
 
     aliases = {
@@ -38,6 +36,8 @@ def build_pred_table_from_results(
     flow_order: list[str] = FLOW_ORDER,
     class_order: list[str] = CLASS_ORDER,
 ) -> pd.DataFrame:
+    """Convert a results dictionary into a route-by-class prediction table."""
+
     pred = pd.DataFrame(0, index=flow_order, columns=class_order, dtype=int)
     od = results_obj.get("od_counts", {})
 
@@ -54,10 +54,6 @@ def build_pred_table_from_results(
 
     pred["Sum"] = pred[class_order].sum(axis=1)
     return pred
-
-
-
-
 
 def display_model_results(
     gt_df: pd.DataFrame,
@@ -90,6 +86,17 @@ def display_model_results(
         print("\n--- DIFF TABLE (pred - gt) ---")
         display(diff_df)
 
+        # Additionally display class-error (%) aggregated across all routes
+        try:
+            gt_totals = gt_df[class_order].sum()
+            diff_totals = abs(diff_df[class_order]).sum()
+            class_err_pct = (diff_totals / gt_totals.replace(0, np.nan) * 100.0).round(1)
+            class_err_pct = pd.DataFrame([class_err_pct], index=["All routes"])
+            print("\n--- CLASS ERROR (ALL ROUTES, % of GT) ---")
+            display(class_err_pct)
+        except Exception:
+            pass
+
         row = summary_df[
             (summary_df["model"] == model_name) &
             (summary_df["tracker"] == tracker_name)
@@ -106,6 +113,8 @@ def display_model_results(
             
             print(
                 f"\n  sum_mae={rr['sum_mae']:.2f}  |  cell_mae={rr['cell_mae']:.2f}  |  "
+                f"class_rel_err={rr.get('class_relative_error', float('nan')):.1f}%  |  "
+                f"route_rel_err={rr.get('route_relative_error', float('nan')):.1f}%  |  "
                 f"total_pred={int(rr['total_pred'])}  |  total_gt={int(rr['total_gt'])}  |  "
                 f"total_err={int(rr['total_err'])}  |  total_abs_pct_err={rr['total_abs_pct_err']:.1f}%  |  "
                 f"perfect_routes={int(perfect)}"
@@ -153,6 +162,16 @@ def plot_class_distribution_detailed(
         if isinstance(person_counts, dict):
             return int(sum(int(v) for v in person_counts.values()))
         return 0
+
+    def _cell_mae_for_key(key: tuple[str, str]) -> float:
+        diff_df = all_diff_tables[key]
+        return float(abs(diff_df[class_order]).values.mean())
+
+    def _sum_mae_for_key(key: tuple[str, str]) -> float:
+        diff_df = all_diff_tables[key]
+        if "Sum" in diff_df.columns:
+            return float(abs(diff_df.loc[flow_order, "Sum"]).mean())
+        return float(abs(diff_df.loc[flow_order, class_order].sum(axis=1)).mean())
 
     fig, axes = plt.subplots(2, 2, figsize=(18, 10))
     
@@ -250,12 +269,14 @@ def plot_class_distribution_detailed(
     ax.legend(fontsize=9)
     ax.grid(True, alpha=0.3, axis="y")
     
-    # Plot 3: Route-level accuracy (perfect routes) - use best model
+    # Plot 3: Route-level accuracy (perfect routes) - use best model by lowest sum MAE
     ax = axes[1, 0]
     
-    # Find best model based on lowest sum_mae
-    best_key = min(all_diff_tables.keys(), 
-                   key=lambda k: abs(all_diff_tables[k][class_order]).values.mean())
+    # Find best model based on lowest sum MAE (tie-break on cell MAE)
+    best_key = min(
+        all_diff_tables.keys(),
+        key=lambda k: (_sum_mae_for_key(k), _cell_mae_for_key(k)),
+    )
     best_model_name, best_tracker_name = best_key
     
     # Get the color index for the best model to match Plot 1 and 2
@@ -296,59 +317,68 @@ def plot_class_distribution_detailed(
         
         total_gt = gt_df["Sum"].sum()
         total_pred = pred_df["Sum"].sum()
-        mae = abs(diff_df[class_order]).values.mean()
-        pct_err = abs(total_pred - total_gt) / total_gt * 100
-        # Perfect = ALL classes in ALL routes must be correct (strict matching, not just total)
-        # Filter to flow_order to only count the relevant routes
-        perfect = ((abs(diff_df.loc[flow_order, class_order]) == 0).all(axis=1)).sum()
+        pct_err = abs(total_pred - total_gt) / total_gt * 100 if total_gt > 0 else float("nan")
+
+        # class relative error: total abs class error / total gt across classes
+        total_abs_class_error = abs(diff_df[class_order]).values.sum()
+        total_gt_classes = gt_df[class_order].values.sum()
+        class_rel = (total_abs_class_error / total_gt_classes * 100.0) if total_gt_classes > 0 else float("nan")
+
+        # route relative error: mean(|pred_route - gt_route| / gt_route) across routes with gt>0
+        route_abs = abs(diff_df.loc[flow_order, class_order].sum(axis=1))
+        route_gt = gt_df.loc[flow_order, "Sum"]
+        valid_routes = route_gt > 0
+        if valid_routes.any():
+            per_route_rel = (route_abs[valid_routes] / route_gt[valid_routes]).astype(float)
+            route_rel = float(per_route_rel.mean() * 100.0)
+        else:
+            route_rel = float("nan")
 
         person_pred = _person_total_for_key((model_name, tracker_name)) if include_persons else None
         person_err = (person_pred - int(gt_persons)) if include_persons else None
         person_pct_err = (abs(person_err) / gt_persons * 100) if include_persons and gt_persons > 0 else (np.nan if include_persons else None)
-        
+
         summary_data.append(
             (
-                mae,
+                class_rel,
+                route_rel,
                 pct_err,
                 abs(person_err) if include_persons else 0,
                 model_name.replace('.pt', ''),
                 tracker_name,
-                perfect,
-                f"{mae:.2f}",
-                f"{pct_err:.1f}%",
-                f"{perfect}/{len(flow_order)}",
+                f"{class_rel:.1f}%" if not np.isnan(class_rel) else "-",
+                f"{route_rel:.1f}%" if not np.isnan(route_rel) else "-",
+                f"{pct_err:.1f}%" if not np.isnan(pct_err) else "-",
                 f"{int(person_pred)}" if include_persons else None,
                 f"{int(person_err):+d}" if include_persons else None,
                 f"{person_pct_err:.1f}%" if include_persons and not np.isnan(person_pct_err) else "-" if include_persons else None,
             )
         )
 
-    summary_data.sort(key=lambda row: (row[0], row[2], row[1], row[3], row[4]))
+    summary_data.sort(key=lambda row: (row[0], row[1], row[3], row[2], row[4], row[5]))
 
-    max_tracker_len = max((len(str(row[4])) for row in summary_data), default=0)
+    max_tracker_len = max((len(str(row[5])) for row in summary_data), default=0)
 
     if include_persons:
-        table_rows = [[row[3], row[4], row[6], row[7], row[8], row[10]] for row in summary_data]
-        col_widths = [0.18, 0.18, 0.12, 0.14, 0.14, 0.12]
+        table_rows = [[row[4], row[5], row[6], row[7], row[8], row[10]] for row in summary_data]
+        col_widths = [0.18, 0.18, 0.14, 0.14, 0.12, 0.12]
         if max_tracker_len >= 20:
-            # Expand tracker column for long tracker names
-            col_widths = [0.16, 0.28, 0.10, 0.12, 0.12, 0.10]
+            col_widths = [0.16, 0.28, 0.12, 0.12, 0.10, 0.10]
         table = ax.table(
             cellText=table_rows,
-            colLabels=["Model", "Tracker", "MAE", "Error %", "Perfect", "Person Err"],
+            colLabels=["Model", "Tracker", "Class Err", "Route Err", "Error %", "Person Err"],
             cellLoc="center",
             loc="center",
             colWidths=col_widths,
         )
     else:
-        table_rows = [[row[3], row[4], row[6], row[7], row[8]] for row in summary_data]
-        col_widths = [0.2, 0.2, 0.15, 0.2, 0.2]
+        table_rows = [[row[4], row[5], row[6], row[7], row[8]] for row in summary_data]
+        col_widths = [0.24, 0.24, 0.16, 0.16, 0.20]
         if max_tracker_len >= 20:
-            # Expand tracker column for long tracker names
-            col_widths = [0.16, 0.32, 0.12, 0.14, 0.16]
+            col_widths = [0.18, 0.32, 0.14, 0.14, 0.22]
         table = ax.table(
             cellText=table_rows,
-            colLabels=["Model", "Tracker", "MAE", "Error %", "Perfect"],
+            colLabels=["Model", "Tracker", "Class Err", "Route Err", "Error %"],
             cellLoc="center",
             loc="center",
             colWidths=col_widths
@@ -357,19 +387,19 @@ def plot_class_distribution_detailed(
     table.auto_set_font_size(False)
     table.set_fontsize(table_font_size)
     table.scale(1, 2)
-    
+
     # Style header
     n_cols = 6 if include_persons else 5
     for i in range(n_cols):
         table[(0, i)].set_facecolor("#40466e")
         table[(0, i)].set_text_props(weight="bold", color="white")
-    
+
     # Alternate row colors
     for i in range(1, len(table_rows) + 1):
         for j in range(n_cols):
             if i % 2 == 0:
                 table[(i, j)].set_facecolor("#f0f0f0")
-    
+
     ax.set_title(
         f"{video_type} Results Summary" + (" + Persons" if include_persons else ""),
         fontweight="bold",
@@ -381,8 +411,6 @@ def plot_class_distribution_detailed(
     plt.show()
     
     print("\nClass composition analysis complete")
-
-
 
 
 def run_experiments(
@@ -571,6 +599,21 @@ def run_deploy(
     total_err = total_pred - total_gt
     total_abs_pct_err = (abs(total_err) / total_gt * 100.0) if total_gt > 0 else float("nan")
 
+    # Class-level relative error: total absolute class-cell error / total GT across classes
+    total_abs_class_error = abs_diff[class_order].values.sum()
+    total_gt_classes = gt_df[class_order].values.sum()
+    class_relative_error = (total_abs_class_error / total_gt_classes * 100.0) if total_gt_classes > 0 else float("nan")
+
+    # Route-level relative error: mean(|pred_route - gt_route| / gt_route) across routes with gt>0
+    route_abs = abs_diff[class_order].sum(axis=1)
+    route_gt = gt_df["Sum"]
+    valid_routes = route_gt > 0
+    if valid_routes.any():
+        per_route_rel = (route_abs[valid_routes] / route_gt[valid_routes]).astype(float)
+        route_relative_error = float(per_route_rel.mean() * 100.0)
+    else:
+        route_relative_error = float("nan")
+
     vehicle_row = {
         "model": model_name,
         "tracker": tracker_name,
@@ -578,12 +621,31 @@ def run_deploy(
         "unique_ids": results.get("unique_ids", float("nan")),
         "cell_mae": float(abs_diff[class_order].values.mean()),
         "sum_mae": float(abs_diff["Sum"].mean()),
+        "class_relative_error": float(class_relative_error),
+        "route_relative_error": float(route_relative_error),
         "total_gt": total_gt,
         "total_pred": total_pred,
         "total_err": total_err,
         "total_abs_pct_err": float(total_abs_pct_err),
         "perfect_routes": int(((abs_diff[class_order] == 0).all(axis=1)).sum()),
     }
+
+    # Add Route Err % column to diff_df (right of 'Sum') - per-route relative error
+    try:
+        route_abs_series = abs_diff[class_order].sum(axis=1)
+        route_gt_series = gt_df["Sum"]
+        route_err_pct = pd.Series(index=diff_df.index, dtype=float)
+        valid = route_gt_series > 0
+        route_err_pct.loc[valid] = (route_abs_series[valid] / route_gt_series[valid]) * 100.0
+        route_err_pct.loc[~valid] = float("nan")
+
+        # Insert after Sum
+        cols = list(diff_df.columns)
+        insert_pos = cols.index("Sum") + 1 if "Sum" in cols else len(cols)
+        diff_df.insert(insert_pos, "Route Err %", route_err_pct.round(1))
+    except Exception:
+        # If anything goes wrong, keep original diff_df
+        pass
 
     zone_events = [
         od for od in results.get("od_events", [])
@@ -610,8 +672,6 @@ def run_deploy(
         "vehicle_row": vehicle_row,
         "persons_row": persons_row,
     }
-
-
 
 
 __all__ = [

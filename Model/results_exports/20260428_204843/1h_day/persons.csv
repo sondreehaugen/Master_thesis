@@ -1,0 +1,2 @@
+model,tracker,gt_persons,predicted_persons,error,pct_error
+YOLO26m_final.pt,day_botsort,7,6,-1,14.285714285714285
