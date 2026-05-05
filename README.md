@@ -96,10 +96,13 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ### 2. Prepare Data
 
+The project videos can be found here:
+https://drive.google.com/drive/folders/1URVaRy9w-l9IAbhufSzgE5KuEVjegVE2
+
 **Required Files Structure:**
 ```
 Model/
-├── videos/
+├── Video/
 │   ├── Fv587_Haukeland_15min.mp4           # Day video
 │   ├── Fv587_Haukeland_night_1h.mp4        # Night video
 │   └── Fv587_Haukeland_10min_transition.mp4 # Transition
@@ -261,7 +264,8 @@ DayNightDetector(
 ```python
 TrackerSwitcher(
     initial_mode="day",
-    HOLD_FRAMES=150      # ~5 seconds before committing to new mode
+    fps=30.0,
+    hold_seconds=5.0     # Seconds before committing to new mode
 )
 ```
 
@@ -376,7 +380,7 @@ Main tracking function orchestrating all components.
 ## 🐛 Troubleshooting
 
 ### Tracker switches too frequently
-→ Increase `TrackerSwitcher.HOLD_FRAMES` (higher = more hysteresis)
+→ Increase `hold_seconds` in `TrackerSwitcher` or `tracker_hold_seconds` in `run_video_deploy()`
 
 ### Missing O-D counts
 → Check `zone_dwell_frames` and `min_track_frames` thresholds  
@@ -419,7 +423,7 @@ For thesis or publication:
 
 - [ ] Python 3.8+ installed
 - [ ] Dependencies installed (`pip install -r requirements.txt`)
-- [ ] Video files in `Model/videos/` or accessible path
+- [ ] Video files in `Model/Video/` or accessible path
 - [ ] Pretrained models (YOLO26m_final.pt, etc.) downloaded
 - [ ] Tracker config files (*.yaml) in correct directory
 - [ ] Ground truth annotations loaded in `GT.py`
