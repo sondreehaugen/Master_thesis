@@ -40,7 +40,7 @@ The final performance of both the YOLO26n and YOLO26m models was evaluated on th
 \label{tab:test_results_n}
 \begin{tabular}{lcccccc}
 \toprule
-\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Presicion} & \textbf{Recall} & \textbf{mAP$^{50}$} & \textbf{mAP$^{50-95}$} \\
+\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Precision} & \textbf{Recall} & \textbf{mAP$^{50}$} & \textbf{mAP$^{50-95}$} \\
 \midrule
 All & 193 & 761 & 0.605 & 0.750 & 0.693 & 0.556 \\
 \midrule
@@ -61,7 +61,7 @@ Semi-trailer & 48 & 49 & 0.705 & 0.796 & 0.869 & 0.756 \\ \hline
 \label{tab:test_results_m}
 \begin{tabular}{lcccccc}
 \toprule
-\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Presicion} & \textbf{Recall} & \textbf{mAP$^{50}$} & \textbf{mAP$^{50-95}$} \\
+\textbf{Class} & \textbf{Images} & \textbf{Instances} & \textbf{Precision} & \textbf{Recall} & \textbf{mAP$^{50}$} & \textbf{mAP$^{50-95}$} \\
 \midrule
 All & 193 & 761 & 0.810 & 0.781 & 0.808 & 0.638 \\
 \midrule
@@ -134,7 +134,7 @@ This section evaluates the MOT pipeline that integrates YOLO26 detections into v
 \subsection{Daytime Tracking Performance}
 \label{subsec:daytime_tracking}
 
-The daytime tracking comparison and evaluation used a 15-minute and 1-hour video segment recorded under daylight conditions at the Fv587 Haukeland intersection. Six model-tracker combinations were tested: YOLO26n and YOLO26m paired with three tracking algorithms (ByteTrack, default BoT-SORT, and a custom Day BoT-SORT). For each combination, the predicted O--D matrix was compared against manually annotated ground truth using Class error (\% of GT), route error (\% of GT), and total count error (\%). 
+The daytime tracking comparison and evaluation used a 15-minute and 1-hour video segment recorded under daylight conditions at the Fv587 Haukeland intersection. Six model-tracker combinations were tested: YOLO26n and YOLO26m paired with three tracking algorithms (ByteTrack, default BoT-SORT, and a custom Day BoT-SORT). For each combination, the predicted O--D matrix was compared against the manually annotated ground truth.
 
 \subsubsection{Comparative Results: 15-Minute Evaluation}
 

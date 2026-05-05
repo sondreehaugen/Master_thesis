@@ -15,11 +15,13 @@ This system detects and tracks vehicles and pedestrians across dynamic lighting 
 - **Split-ID recovery** for continuity across tracker switches
 
 ### Key Results (Preliminary)
-| Scenario | YOLO26m mAP50 | Tracking MAE | Error Rate |
-|----------|---------------|--------------|-----------|
-| **Daytime** | 0.808 | 0.9% | Near-perfect |
-| **Nighttime** | — | 0.0% | Excellent |
-| **Transition** | — | 0.0% | Perfect |
+| Scenario | Class Error | Route Error | Total Error |
+|----------|-------------|-------------|-------------|
+| **Daytime** | 2.3% | 6.2% | 0.5% |
+| **Nighttime** | 9.0% | 3.7% | 1.5% |
+| **Transition** | 0.0% | 0.0% | 0.0% |
+
+Model used for reported results: YOLO26m (see `Model/` for weights).
 
 ---
 
@@ -402,9 +404,9 @@ Main tracking function orchestrating all components.
 For thesis or publication:
 ```bibtex
 @thesis{haugen_2026,
-  author = {Sondre Haugen},
-  title = {Adaptive Vehicle Tracking Across Day/Night Conditions},
-  school = {University of Oslo},
+    author = {Sondre Eliassen Haugen and Eirik \AA rdal Hjelm},
+  title = {Exploring Machine Vision for Vehicle and Object Detection in Road Environments},
+    school = {Norwegian University of Life Sciences (NMBU)},
   year = {2026}
 }
 ```
@@ -414,6 +416,7 @@ For thesis or publication:
 ## 📝 License & Attribution
 
 - **YOLO**: Ultralytics YOLOv8 (AGPL-3.0)
+- **YOLO models**: YOLO26n / YOLO26m (custom weights; implementation based on the Ultralytics codebase)
 - **Trackers**: ByteTrack, BoT-SORT (Apache 2.0, BSD)
 - **Custom Code**: Master's Thesis Project
 
@@ -442,7 +445,7 @@ Refer to:
 
 ---
 
-**Last Updated**: April 2026  
+**Last Updated**: May 2026  
 **Status**: Production-Ready  
 **Python**: 3.8+  
 **Main Dependencies**: PyTorch, OpenCV, Ultralytics, Pandas
