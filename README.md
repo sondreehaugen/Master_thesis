@@ -14,7 +14,7 @@ This system detects and tracks vehicles and pedestrians across dynamic lighting 
 - **Zone-based counting** for origin-destination (O-D) matrix analysis
 - **Split-ID recovery** for continuity across tracker switches
 
-### Key Results (Preliminary)
+### Key Results
 | Scenario | Class Error | Route Error | Total Error |
 |----------|-------------|-------------|-------------|
 | **Daytime** | 2.3% | 6.2% | 0.5% |
