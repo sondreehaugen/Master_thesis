@@ -9,6 +9,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[norsk,english]{babel}
+\usepackage{ifxetex}
 
 % Marger
 \usepackage[a4paper,
@@ -41,6 +42,8 @@
 \usepackage{subcaption}
 \usepackage[labelfont=bf,labelsep=colon]{caption}
 \renewcommand{\figurename}{Fig.}
+\usepackage{tikz}
+\usetikzlibrary{calc}
 \usepackage{float}
 \usepackage{placeins}
 \usepackage{booktabs}
@@ -111,10 +114,63 @@
     pdftitle={Preliminary Study for the Master's Thesis}
 }
 
+\ifxetex
+    \usepackage{fontspec}
+    \newfontfamily{\arial}{Arial}
+\else
+    \usepackage{helvet}
+    \newcommand*\arial{\sffamily}
+\fi
+
+\makeatletter
+\newcommand{\thesisyear}[1]{\gdef\@thesisyear{#1}}
+\newcommand{\credits}[1]{\gdef\@credits{#1}}
+\newcommand{\faculty}[1]{\gdef\@faculty{#1}}
+\newcommand{\studyprogramme}[1]{\gdef\@studyprogramme{#1}}
+\newcommand{\supervisor}[1]{\gdef\@supervisor{#1}}
+\providecommand{\@thesisyear}{}
+\providecommand{\@credits}{}
+\providecommand{\@faculty}{}
+\providecommand{\@studyprogramme}{}
+\providecommand{\@supervisor}{}
+\newcommand{\setmetadata}{%
+\ifxetex
+        \special { pdf:docinfo <<
+            /Title (\@title)
+            /Author (\@author)
+            /Producer (\@author, Supervision: \@supervisor)
+            /Creator (\@author)
+            /Subject (Master's Thesis \@thesisyear (\@credits ECTS))
+            /Keywords (Norwegian University of Life Science, \@faculty, \@studyprogramme)
+         >> }
+\else
+\pdfinfo{
+    /Title (\@title)
+    /Author (\@author)
+    /Producer (\@author, Supervision: \@supervisor)
+    /Creator (\@author)
+    /Subject (Master's Thesis \@thesisyear (\@credits ECTS))
+    /Keywords (Norwegian University of Life Science, \@faculty, \@studyprogramme)
+    }
+\fi
+}
+\makeatother
+
+\title{Exploring Machine Vision for Vehicle and Object Detection in Road Environments}
+\author{Eirik Årdal Hjelm, Sondre Eliassen Haugen}
+\thesisyear{2026}
+\credits{30}
+\faculty{Faculty of Science and Technology (REALTEK)}
+\studyprogramme{Industrial Economics (INDØK)}
+\supervisor{Øyvind Lervik Nilsen}
+
+\input{project/frontpage_nmbu_defs}
+
 % =========================================================
 %                 DOCUMENT START
 % =========================================================
 \begin{document}
+\setmetadata
 
 % =========================
 % FRONT MATTER (Roman numerals)

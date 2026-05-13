@@ -1,7 +1,7 @@
 # Vehicle Tracking & Counting System
 ## Adaptive Day/Night Tracking for Road Traffic Analysis
 
-A production-ready tracking pipeline for evaluating multi-modal vehicle detection and tracking across day and night conditions with dynamic tracker switching and post-processing recovery.
+A tracking pipeline developed for a master's thesis, for evaluating vehicle detection and tracking across day and night conditions with dynamic tracker switching and post-processing recovery.
 
 ---
 
@@ -29,22 +29,21 @@ Model used for reported results: YOLO26m (see `Model/` for weights).
 
 ### Module Structure
 ```
-src/
-├── run_video_deploy.py (442 lines)      # Main orchestrator
-├── day_night_detection.py (109 lines)   # Lighting detection + switching
-├── zone_counting.py (275 lines)         # Zone tracking & O-D counting
-├── split_id_fallback.py (270 lines)     # Split track ID recovery
-├── evaluation.py (624 lines)            # Experiment pipeline
-├── GT.py (253 lines)                    # Ground truth management
-├── tracking_utils.py (151 lines)        # Setup & visualization
-├── geometry.py (24 lines)               # Point/polygon utilities
-├── explainable_ai.py (237 lines)        # XAI analysis (optional)
-└── __init__.py                          # Package exports
+Model/src/
+├── run_video_deploy.py       # Main orchestrator
+├── day_night_detection.py    # Lighting detection + switching
+├── zone_counting.py          # Zone tracking & O-D counting
+├── split_id_fallback.py      # Split track ID recovery
+├── evaluation.py             # Experiment pipeline
+├── GT.py                     # Ground truth (aggregate counts)
+├── tracking_utils.py         # Setup & visualization
+├── geometry.py               # Point/polygon utilities
+└── __init__.py               # Package exports
 ```
 
 ### Dependency Graph
 ```
-tracking.ipynb (MAIN NOTEBOOK)
+Model/tracking.ipynb (MAIN NOTEBOOK)
     ├── run_video_deploy()           → Core tracking pipeline
     │   ├── DayNightDetector        → HSV-based detection
     │   ├── TrackerSwitcher         → Hysteresis switching
@@ -55,9 +54,9 @@ tracking.ipynb (MAIN NOTEBOOK)
     └── plot_class_distribution()    → Class analysis
 ```
 
-### Class Taxonomy (7 classes)
+### Class Taxonomy (8 classes)
 ```
-Vehicle Types:
+Vehicle + pedestrian classes:
 - Car
 - Light Truck
 - Heavy Truck
@@ -79,7 +78,7 @@ Vehicle Types:
 # Clone/download the project
 cd Master_Thesis/Model
 
-# Create Python environment (Python 3.8+)
+# Create Python environment (Python 3.10+ recommended)
 python -m venv venv
 source venv/bin/activate
 
@@ -118,12 +117,14 @@ Model/
 ```
 
 **Ground Truth Format:**
-Ground truth is stored in `src/GT.py` as a hardcoded dictionary:
+Ground truth is stored in `Model/src/GT.py` as aggregate route and class counts per video:
 ```python
 GT_BY_VIDEO = {
     "Fv587_Haukeland_15min.mp4": {
-        "vehicles": [...],  # List of [frame, x1, y1, x2, y2, class_id]
-        "persons": [...]
+        "S->N": {"car": 134, "light truck": 5, ...},
+        "N->S": {"car": 71, "light truck": 4, ...},
+        ...,
+        "Gangfeltet": {"person": 3},
     },
     ...
 }
@@ -132,7 +133,7 @@ GT_BY_VIDEO = {
 ### 3. Run the Notebook
 
 ```python
-# In tracking.ipynb, run cells sequentially:
+# In Model/tracking.ipynb, run cells sequentially:
 # 1. Setup & Imports
 # 2. Define Zones (customize polygon coordinates for your camera)
 # 3. Run experiments on DAY/NIGHT/TRANSITION videos
@@ -424,15 +425,15 @@ For thesis or publication:
 
 ## ✅ Checklist for Running
 
-- [ ] Python 3.8+ installed
-- [ ] Dependencies installed (`pip install -r requirements.txt`)
+- [ ] Python 3.10+ installed
+- [ ] Dependencies installed (see Installation section)
 - [ ] Video files in `Model/Video/` or accessible path
 - [ ] Pretrained models (YOLO26m_final.pt, etc.) downloaded
 - [ ] Tracker config files (*.yaml) in correct directory
 - [ ] Ground truth annotations loaded in `GT.py`
 - [ ] Zone polygons defined for your camera view
 - [ ] GPU available (recommended for real-time performance)
-- [ ] Run `tracking.ipynb` sequentially from top
+- [ ] Run `Model/tracking.ipynb` sequentially from top
 
 ---
 
@@ -440,12 +441,12 @@ For thesis or publication:
 
 Refer to:
 - Inline code comments for implementation details
-- `tracking.ipynb` for end-to-end workflow examples
+- `Model/tracking.ipynb` for end-to-end workflow examples
 - Module docstrings for function signatures
 
 ---
 
 **Last Updated**: May 2026  
-**Status**: Production-Ready  
-**Python**: 3.8+  
+**Status**: Research / thesis code  
+**Python**: 3.10+ (tested in the thesis workflow on newer versions)  
 **Main Dependencies**: PyTorch, OpenCV, Ultralytics, Pandas

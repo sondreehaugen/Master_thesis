@@ -1,38 +1,39 @@
 \chapter{Results}
 \label{chap:results}
-This chapter presents the empirical findings of the study, organized around the three research questions in \autoref{sec:rq}. Section~\ref{sec:training-results} evaluates the performance of fine-tuned YOLO26 detection models on a custom traffic dataset containing 1282 annotated frames collected at urban intersections in Norway. Section~\ref{sec:tracking_results} presents tracking pipeline performance, examining how different model-tracker combinations reconstruct vehicle trajectories and estimate origin--destination movements under varying lighting conditions (daytime, nighttime, and transition). The evaluation includes benchmark comparisons on standardized metrics and validation against manually annotated ground-truth data.
+
+This chapter presents the empirical findings of the study, organized around the three research questions in \autoref{sec:rq}. Section~\ref{sec:training-results} evaluates the performance of fine-tuned YOLO26 detection models on a custom traffic dataset containing 1282 annotated frames collected at two intersections in Norway. Section~\ref{sec:tracking_results} presents tracking pipeline performance. It examines how different model-tracker combinations reconstruct vehicle trajectories and estimate O-D movements under varying lighting conditions. The evaluation includes benchmark comparisons on standardized metrics and validation against manually annotated ground-truth data.
 
 \section{YOLO Results}
 \label{sec:training-results}
-This section presents the performance of YOLO26n and YOLO26m models fine-tuned for fine-grained vehicle classification at an intersection. Both models were trained on the custom traffic dataset and evaluated on an independent test set to assess their performance. YOLO26n was trained for 87 epochs before early stopping triggered at a validation loss plateau; YOLO26m completed all 100 epochs. Results are reported using standard detection metrics (mAP$^{50-95}$, mAP$^{50}$, precision, recall) to address the first research question on fine-grained vehicle classification.
+This section presents the performance of the YOLO26n and YOLO26m models, fine-tuned for detailed vehicle classification at the intersections. Both models were trained on the custom traffic dataset and evaluated on an independent test set to assess their performance. 
 
+YOLO26n was trained for 87 epochs before early stopping was triggered at a validation loss plateau. YOLO26m, on the other hand, completed all 100 epochs. Results are reported using standard detection metrics (mAP$^{50-95}$, mAP$^{50}$, precision, recall) to address the first research question on detailed vehicle classification.
 
 \subsection{Model Training and Validation}
 \label{sec:yolo_train_val}
-\subsubsection{mAP$^{50-95}$ and mAP$^{50}$}
-The training progress of the YOLO26n and YOLO26m models was evaluated using mAP$^{50-95}$ and mAP$^{50}$. As shown in \autoref{fig:train_val_map}, both models exhibit a consistent upward trajectory. The YOLO26m model achieves a higher peak mAP$^{50}$ of 0.9027, compared to 0.7421 for the YOLO26n variant. Similarly, for the stricter mAP$^{50-95}$ metric, YOLO26m reaches a peak of 0.7237, while YOLO26n peaks at 0.5989. Performance for both models effectively plateaus after epoch 55, indicating they have reached their learning capacity for the dataset.
+
+The training progress of the YOLO26n and YOLO26m models was evaluated using mAP$^{50-95}$ and mAP$^{50}$. As shown in \autoref{fig:train_val_map}, both models exhibit a consistent upward trajectory. The YOLO26m model achieves a higher peak mAP$^{50}$ of 0.903, compared to 0.742 for the YOLO26n variant. Similarly, for the stricter mAP$^{50-95}$ metric, YOLO26m reaches a peak of 0.724, while YOLO26n peaks at 0.599. Performance for both models effectively plateaus after epoch 55, indicating they have reached their learning capacity for the dataset.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1.0\linewidth]{project/images/yolo_n_vs_m/train_val_map.png}
-\caption{Training progress comparison of YOLO26n and YOLO26m for mAP$^{50-95}$ (left) and mAP$^{50}$ (right).}
+\caption[Training progress comparison of YOLO26n and YOLO26m for mAP$^{50-95}$ and mAP$^{50}$]{Training progress comparison of YOLO26n and YOLO26m for mAP$^{50-95}$ (left) and mAP$^{50}$ (right).}
 \label{fig:train_val_map}
 \end{figure}
 
-\subsubsection{Precision and Recall}
-The specific trade-offs between Precision and Recall are illustrated in \autoref{fig:train_val_pr}. While both metrics maintain a general upward trend, they exhibit higher volatility compared to the mAP scores. The YOLO26m variant demonstrates significantly superior sensitivity, reaching a peak recall of 0.8658, whereas YOLO26n reaches a maximum of 0.7085. In terms of Precision, YOLO26m peaks at 0.9239 and YOLO26n at 0.9083.
+The specific trade-offs between Precision and Recall are illustrated in \autoref{fig:train_val_pr}. While both metrics maintain a general upward trend, they exhibit higher volatility compared to the mAP scores. The YOLO26m variant demonstrates significantly superior sensitivity, reaching a peak recall of 0.866, whereas YOLO26n reaches a maximum of 0.709. In terms of Precision, YOLO26m peaks at 0.924 and YOLO26n at 0.908.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=1.0\linewidth]{project/images/yolo_n_vs_m/train_val_pr.png}
-\caption{Training progress comparison of YOLO26n and YOLO26m for Precision (left) and Recall (right).}
+\caption[Training progress comparison of YOLO26n and YOLO26m for Precision and Recall]{Training progress comparison of YOLO26n and YOLO26m for Precision (left) and Recall (right).}
 \label{fig:train_val_pr}
 \end{figure} 
 
 
 \subsection{Performance on Test Set}
 \label{sec:test_results}
-The final performance of both the YOLO26n and YOLO26m models was evaluated on the same independent test set of 193 images containing 761 object instances, as detailed in \autoref{tab:test_results_n} and \autoref{tab:test_results_m}. The YOLO26n model achieved an overall mAP$^{50}$ of 0.693 and an mAP$^{50-95}$ of 0.556, while the YOLO26m variant delivered noticeably stronger results with an mAP$^{50}$ of 0.808 and an mAP$^{50-95}$ of 0.638. Notably, stronger performance was observed on the validation set (see Appendix~\ref{app:val_metrics}).
+The final performance of both the YOLO26n and YOLO26m models was evaluated on the test set, containing 193 images with 761 object instances, as detailed in \autoref{tab:test_results_n} and \autoref{tab:test_results_m}. The YOLO26n model achieved an overall mAP$^{50}$ of 0.693 and an mAP$^{50-95}$ of 0.556, while the YOLO26m variant delivered substantially stronger results with an mAP$^{50}$ of 0.808 and an mAP$^{50-95}$ of 0.638. Notably, stronger performance was observed on the validation set (see Appendix~\ref{app:val_metrics}).
 
 \begin{table}[H]
 \centering
@@ -77,76 +78,68 @@ Semi-trailer & 48 & 49 & 0.890 & 0.827 & 0.912 & 0.777 \\
 \end{tabular}
 \end{table}
 
-Analysis of individual classes shows that the \textit{Car} category remains the most accurately detected for both models, with AP$^{50}$ values of 0.945 (YOLO26n) and 0.960 (YOLO26m) and recall values above 0.91. As motivated by the research gap in Section~\ref{sec:research_gap}, performance is also reported for the expanded heavy-vehicle classes. \textit{Heavy Truck} and \textit{Semi-trailer} demonstrated high reliability across both model variants, with AP$^{50}$ values of 0.743/0.817 and 0.869/0.912 for YOLO26n/YOLO26m, respectively. \textit{Light-truck} performs the worst of the truck classes, with AP$^{50}$ values of 0.697/0.780.
+The \textit{Car} category remained the most accurately detected class for both models, with AP$^{50}$ values of 0.945 and 0.960, and recall values of 0.936 and 0.917 for the nano and medium models respectively. Performance is also reported for the expanded heavy-vehicle classes, as motivated by the knowledge gap in Section~\ref{sec:research_gap}. \textit{Heavy Truck} and \textit{Semi-trailer} demonstrated high reliability across both model variants, with AP50$^{50}$ values of 0.743/0.817 and 0.869/0.912 for YOLO26n and YOLO26m. \textit{Light-truck} performs the worst of the truck classes, with AP$^{50}$ values of 0.697/0.780. Only two \textit{Bicycle} instances were included in the test set, leading to low and unstable performance estimates, particularly for the nano model.
 
-Only two instances of \textit{Bicycle} ended up in the test set, resulting in low and unstable scores, especially for the nano model.
-
-
-
-The Precision-Recall (PR) curves for all evaluated classes are presented in \autoref{fig:BoxPR_curve} for both the YOLO26n (left) and YOLO26m (right) models. The area under each curve corresponds to the AP for that specific category, with the bold blue line representing the mAP$^{50}$ of 0.693 for YOLO26n and 0.808 for YOLO26m.
+The Precision-Recall (PR) curves for all evaluated classes are presented in \autoref{fig:BoxPR_curve}. The area under each curve corresponds to the AP for that specific category. The bold blue line represents the mAP$^{50}$ of 0.693 for YOLO26n and 0.808 for YOLO26m.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=1\linewidth]{project//images//yolo_n_vs_m/PR-curves.png}
-    \caption{Precision-Recall curve for all classes for both models. The area under each curve represents the average precision for a specific class.}
+    \includegraphics[width=1\linewidth]{project/images/yolo_n_vs_m/PR-curves.png}
+    \caption[Precision-Recall curve for all classes for both models]{Precision-Recall curve for all classes for both models. The area under each curve represents the AP for a specific class.}
     \label{fig:BoxPR_curve}
 \end{figure}
 
-The 'Car' class (orange line) displays a near-ideal trajectory in both models, maintaining high precision even as recall approaches 1.0, which accounts for its superior AP of 0.945 (YOLO26n) and 0.960 (YOLO26m). Other vehicle categories, such as 'Heavy Truck' and 'Semi-trailer', also demonstrate robust curves with large areas under their respective trajectories in both variants. In contrast, classes like 'Light Truck' and 'Bus' exhibit steeper declines in precision at higher recall levels. Overall, the PR curves confirm that both models maintain a high level of precision across a majority of the recall spectrum, validating the mAP scores presented in \autoref{tab:test_results_n} and \autoref{tab:test_results_m}.
+The 'Car' class (orange line) displays a near-ideal trajectory in both models. It maintains high precision even as recall approaches 1.0, which accounts for its superior AP of 0.945 (YOLO26n) and 0.960 (YOLO26m). Other vehicle categories, such as 'Heavy Truck' and 'Semi-trailer', also demonstrate robust curves with large areas under their respective trajectories in both variants. In contrast, classes like 'Light Truck' and 'Bus' exhibit steeper declines in precision at higher recall levels. Overall, the PR curves indicate that both models maintain high precision across much of the recall range for most classes, supporting the mAP scores reported in \autoref{tab:test_results_n} and \autoref{tab:test_results_m}.
 
-The raw counts and row-normalized confusion matrices for the test dataset are presented in \autoref{fig:yolo26n_conf_raw} and \autoref{fig:yolo26n_conf_norm} (YOLO26n) as well as \autoref{fig:yolo26m_conf_raw} and \autoref{fig:yolo26m_conf_norm} (YOLO26m). Both models exhibit strong diagonal values, indicating high recall across most classes. The 'Car' class, in particular, demonstrates exceptional prediction reliability (0.87 for YOLO26n and 0.92 for YOLO26m). Furthermore, the YOLO26m variant shows a marked improvement in recall for the 'Person' class (0.69 vs.\ 0.48) and the 'Semi-trailer' class (0.81 vs.\ 0.72), indicating better detection in these categories compared to the nano model.
+The raw counts and row-normalized confusion matrices for the test dataset are presented in \autoref{fig:yolo26n_conf_raw} and \autoref{fig:yolo26n_conf_norm} (YOLO26n) as well as \autoref{fig:yolo26m_conf_raw} and \autoref{fig:yolo26m_conf_norm} (YOLO26m). Both models exhibit strong diagonal values, indicating high recall across most classes. The 'Car' class, in particular, demonstrates exceptional prediction reliability (0.87 for YOLO26n and 0.92 for YOLO26m). Furthermore, the YOLO26m variant shows a marked improvement in recall for the 'Person' class (0.69 vs.\ 0.48) and the 'Semi-trailer' class (0.81 vs.\ 0.72). This indicates better detection in these categories compared to the nano model.
 
-Both models exhibit some confusion with the background. As "background" is not a defined object class, it has no true positives. False negatives against the background represent annotated objects that the model failed to detect, while false positives represent regions where the model incorrectly predicted an object where none was annotated.
-The YOLO26n model, for example, produced 77 false negatives for cars and 41 false positives. The YOLO26m model shows a similar pattern.
+
 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/yolo26n_conf_raw.png}
+    \includegraphics[width=0.8\linewidth]{project/images/yolo_test/yolo26n_conf_raw.png}
     \caption{YOLO26n Confusion Matrix (Raw Counts)}
     \label{fig:yolo26n_conf_raw}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/yolo26m_conf_raw.png}
+    \includegraphics[width=0.8\linewidth]{project/images/yolo_test/yolo26m_conf_raw.png}
     \caption{YOLO26m Confusion Matrix (Raw Counts)}
     \label{fig:yolo26m_conf_raw}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/yolo26n_conf_norm.png}
+    \includegraphics[width=0.8\linewidth]{project/images/yolo_test/yolo26n_conf_norm.png}
     \caption{YOLO26n Confusion Matrix (Row-Normalized)}
     \label{fig:yolo26n_conf_norm}
 \end{figure}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{project//images//yolo_test/yolo26m_conf_norm.png}
+    \includegraphics[width=0.8\linewidth]{project/images/yolo_test/yolo26m_conf_norm.png}
     \caption{YOLO26m Confusion Matrix (Row-Normalized)}
     \label{fig:yolo26m_conf_norm}
 \end{figure}
 
 
+Both models exhibit some confusion with the background. As "background" is not a defined object class, it has no true positives. False negatives against the background represent annotated objects that the model failed to detect, while false positives represent regions where the model incorrectly predicted an object where none was annotated.
+The YOLO26n model, for example, produced 77 false negatives for cars and 41 false positives. The YOLO26m model shows a similar pattern.
+
 \section{Tracking Results}
 \label{sec:tracking_results}
-
-This section evaluates the MOT pipeline that integrates YOLO26 detections into vehicle trajectories and origin--destination (O--D) movements. Four distinct experiments are presented: a 15-minute daytime segment for tracker configuration comparison; a 1-hour daytime rush-hour segment for best-configuration performance validation; a 1-hour nighttime segment under low-light conditions; and lastly, a 10-minute twilight segment validating adaptive switching between day and night tracker configurations. The evaluation measures class-level errors, route-level errors, and total vehicle count errors against manually annotated ground truth, directly addressing the second research question on performance under varying lighting conditions. Additionally, the fourth experiment addresses the third research question by evaluating the system’s ability to operate autonomously during day–night transitions using adaptive tracker switching.
+This section evaluates the MOT pipeline that integrates YOLO26 detections into vehicle trajectories and O-D movements. Four distinct experiments are presented: a 15-minute daytime segment for tracker configuration comparison; a 1-hour daytime rush-hour segment for best-configuration performance validation; a 1-hour nighttime segment under low-light conditions; and lastly, a 10-minute twilight segment validating adaptive switching between day and night tracker configurations. The evaluation measures class-level errors, route-level errors, and total vehicle count errors against manually annotated ground truth. This directly addresses the second research question on performance under varying lighting conditions. Additionally, the fourth experiment addresses the third research question by evaluating the system’s ability to operate autonomously during day–night transitions using adaptive tracker switching.
 
 \subsection{Daytime Tracking Performance}
 \label{subsec:daytime_tracking}
 
-The daytime tracking comparison and evaluation used a 15-minute and 1-hour video segment recorded under daylight conditions at the Fv587 Haukeland intersection. Six model-tracker combinations were tested: YOLO26n and YOLO26m paired with three tracking algorithms (ByteTrack, default BoT-SORT, and a custom Day BoT-SORT). For each combination, the predicted O--D matrix was compared against the manually annotated ground truth.
+The daytime tracking comparison and evaluation used a 15-minute and 1-hour video recorded under daylight conditions at the Fv587 Haukeland intersection. Six model-tracker combinations were tested: YOLO26n and YOLO26m paired with three tracking algorithms (ByteTrack, default BoT-SORT, and a custom Day BoT-SORT). For each combination, the predicted O-D matrix was compared against the manually annotated ground truth.
 
 \subsubsection{Comparative Results: 15-Minute Evaluation}
 
 \autoref{tab:od_daytime_all} summarizes the results for all six model–tracker combinations. Overall, YOLO26m consistently outperforms YOLO26n across all tracker variants. For YOLO26m, performance is stable across trackers, with class error ranging from 0.8\% to 2.5\% and route error from 0.4\% to 1.0\%. In contrast, YOLO26n exhibits substantially higher errors, particularly for route estimation, where errors increase to 18.6\%.
 
-The best-performing configuration is YOLO26m combined with the Day BoT-SORT tracker, which achieves the lowest class error (0.8\%), route error (0.4\%), and total error (0.0\%). In addition, this configuration correctly detects all pedestrian crossings in the evaluated segment (3/3).
-
-In terms of computational performance, ByteTrack is the fastest tracker across both model sizes, while BoT-SORT with YOLO26m yields the highest runtime.
-
-
 \begin{table}[H]
-\caption{Daytime results: all model-tracker combinations (15-minute daylight segment).}
+\caption[Daytime results: all model-tracker combinations]{Daytime results: all model-tracker combinations (15-minute daylight segment).}
 \centering
 \small
 \begin{tabular}{l l c c c c c}
@@ -165,24 +158,25 @@ YOLO26n & Day BoT-SORT & 5.5\% & 18.6\% & 2.1\% & -3 & 481 \\
 \label{tab:od_daytime_all}
 \end{table}
 
-\autoref{fig:daytime_class_composition} shows the total detections per class across all model–tracker combinations. A symlog scale is used on the y-axis due to the strong class imbalance, where the car class dominates the distribution and makes smaller classes difficult to visualize on a linear scale. YOLO26m consistently produces class distributions closer to the ground truth across all vehicle categories.
+The best-performing configuration is YOLO26m combined with the Day BoT-SORT tracker, which achieves the lowest class error (0.8\%), route error (0.4\%), and total error (0.0\%). In addition, this configuration correctly detects all pedestrian crossings in the evaluated segment (3/3).
+
+In terms of computational performance, ByteTrack is the fastest tracker across both model sizes, while BoT-SORT with YOLO26m yields the highest runtime.
+
+\autoref{fig:daytime_class_composition} shows the total detections per class across all combinations. A symlog scale is used on the y-axis due to the strong class imbalance, where the car class dominates the distribution and makes minority classes difficult to visualize on a linear scale. YOLO26m consistently produces class distributions closer to the ground truth across almost all vehicle categories.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{project/images/daytime_class_composition_2.png}
-    \caption{Predicted vehicle-class composition for each daytime model-tracker combination, compared with ground truth.}
+    \caption{Predicted vehicle-class composition for each combination, compared with the ground truth (GT).}
     \label{fig:daytime_class_composition}
 \end{figure}
 
 \subsubsection{Per-Class Error Analysis}
 
-\autoref{tab:daytime_class_errors} gives a detailed breakdown of class error for each vehicle category across all daytime model–tracker combinations. The lowest error values for each class are highlighted in bold. YOLO26m consistently achieves lower errors across most vehicle classes, particularly for the majority class (car), where errors range from 0.0\% to 0.9\%.
+\autoref{tab:daytime_class_errors} presents a detailed breakdown of class error for each vehicle category across all daytime configurations. The lowest error values for each class are highlighted in bold. YOLO26m consistently achieves lower errors across most vehicle classes, particularly for the majority class (car), where errors range from 0.0\% to 0.9\%.
 
-For heavy trucks, YOLO26m attains the best performance with 0.0\% error in two configurations, while YOLO26n remains constant at 16.7\% across all trackers. The most pronounced difference is observed for semi‑trailers, where YOLO26m yields values between 0.0\% and 50.0\%, whereas YOLO26n consistently reaches 100.0\% error for all tracker configurations.
-
-Bus detection is optimal across all configurations (0.0\% error), while motorcycle error is constant at 20.0\% for all models and trackers, indicating no measurable improvement from either model scaling or tracker choice for this class.
 \begin{table}[H]
-\caption{Daytime class error (all values in \%) for all model-tracker combinations.}
+\caption[Daytime class error for all model-tracker combinations]{Daytime class error (all values in \%) for all model-tracker combinations.}
 \centering
 \small
 \begin{tabular}{l c c c c c c}
@@ -201,11 +195,16 @@ YOLO26n Day BoT-SORT & 3.3 & 22.2 & 16.7 & 100.0 & \textbf{0.0} & 20.0 \\
 \label{tab:daytime_class_errors}
 \end{table}
 
+For heavy trucks, YOLO26m attains the best performance with 0.0\% error in two configurations, while YOLO26n remains constant at 16.7\% across all trackers. The most pronounced difference is observed for semi‑trailers, where YOLO26m yields values between 0.0\% and 50.0\%, whereas YOLO26n consistently reaches 100.0\% error for all tracker configurations.
+
+Bus detection is optimal across all configurations (0.0\% error), while motorcycle error is constant at 20.0\% for all models and trackers, indicating no measurable improvement from either model scaling or tracker choice for this class.
+
+
 Overall, YOLO26m demonstrates lower and more stable error rates across classes, while YOLO26n shows particularly large deviations for rare vehicle classes, most notably semi‑trailers. Consequently, the combination YOLO26m with the Day BoT‑SORT tracker emerges as the best performing setup for daytime vehicle detection and tracking.
 
 \subsubsection{Best Daytime Configuration: YOLO26m + Day BoT-SORT}
 
-The best-performing daytime configuration was evaluated on a one-hour rush-hour video segment. The system predicted a total of 1072 vehicles against a ground truth count of 1067, yielding a net deviation of $+5$ vehicles and a total count error of 0.5\%. The overall class-wise error and route-wise error are 2.3\% and 6.2\%, respectively. Pedestrian detection at the designated crossing yielded 6 detections against a ground truth of 7, corresponding to a deviation of $-1$. A summary of the top-level metrics is provided in \autoref{tab:od_daytime_1h}.
+The best-performing daytime configuration was evaluated on a 1-hour rush video. The system predicted a total of 1072 vehicles against a ground truth count of 1067, yielding a net deviation of $+5$ vehicles and a total error of 0.5\%. The overall class-error and route-error are 2.3\% and 6.2\%, respectively. Pedestrian detection at the designated crossing yielded 6 detections against a ground truth of 7, corresponding to a deviation of $-1$. A summary of the top-level metrics is provided in \autoref{tab:od_daytime_1h}.
 
 \begin{table}[H]
 \caption{Daytime results: best configuration on 1-hour rush video.}
@@ -222,7 +221,7 @@ YOLO26m & Day BoT-SORT & 2.3\% & 6.2\% & 0.5\% & -1 & 2184 \\
 \label{tab:od_daytime_1h}
 \end{table}
 
-The full origin--destination prediction matrix is presented in \autoref{tab:best_day_pred},
+The full O-D prediction matrix is presented in \autoref{tab:best_day_pred},
 and the corresponding error analysis is given in \autoref{tab:best_day_error_combined}. The
 two dominant traffic movements, S$\to$N and N$\to$S, account for 594 and 408 predicted
 vehicles respectively, together representing 94.6\% of total predicted traffic. The
@@ -232,7 +231,7 @@ largest absolute route-level error occurs on S$\to$N ($+5$ vehicles, 2.2\%), whi
 S$\to$E route exhibits the highest route error percentage at 21.7\%.
 
 \begin{table}[H]
-\caption{Predicted O–D vehicle counts for YOLO26m + Day BoT-SORT (daytime, 1-hour segment).}
+\caption{Predicted O–D vehicle counts for YOLO26m + Day BoT-SORT (daytime, 1-hour video).}
 \centering
 \small
 \begin{tabular}{l c c c c c c c c}
@@ -254,7 +253,7 @@ N→E & 10 & 1 & 0 & 0 & 2 & 0 & 0 & 13 \\
 \end{table}
 
 \begin{table}[H]
-\caption{Error analysis (predicted $-$ ground truth) with relative class-wise error (\%). GT total = 1067 vehicles.}
+\caption{Error analysis (predicted $-$ ground truth) with relative class- and route-errors (\%). GT total = 1067 vehicles.}
 \centering
 \small
 \begin{tabular}{l c c c c c c c c c}
@@ -283,11 +282,9 @@ deviations are observed for bicycles ($-4$, 50.0\%), light trucks ($+4$, 14.3\%)
 motorcycles ($+3$, 9.7\%), while heavy trucks are undercounted by 3 vehicles (12.0\%).
 Buses and semi-trailers exhibit class errors of 14.3\% and 6.9\%, respectively.
 
-Several of these deviations can be attributed to temporary object occlusions, which interrupt continuous tracking and lead to misclassification or missed detections. To mitigate this, a post-processing occlusion recovery mechanism is applied. During the one-hour segment, it identified and resolved a total of 19 occlusion events, of which 15 occurred on the N$\to$S route. Representative examples of successfully recovered occlusions are shown in Figures~\ref{fig:occlusion_en} and~\ref{fig:occlusion_ns}.
+Several of these deviations can be attributed to temporary object occlusions, which interrupt continuous tracking and lead to misclassification or missed detections. To mitigate this, the post-processing occlusion recovery mechanism described in Section~\ref{sec:method_split_id_recovery} is applied. During the 1-hour video, it identified and resolved a total of 19 occlusion events, of which 15 occurred on the N$\to$S route. Representative examples of successfully recovered occlusions are shown in Figures~\ref{fig:occlusion_en} and~\ref{fig:occlusion_ns}.
 
-%The post-processing occlusion recovery mechanism identified and resolved a total of 19 occlusion events during the one-hour segment. Of these, 15 occurred on the N$\to$S route. This directly relates to the challenge highlighted by \cite{Hassan2024}, who emphasize occlusions handling as a future research direction. Representative examples of successfully recovered occlusions are shown in Figures~\ref{fig:occlusion_en} and~\ref{fig:occlusion_ns}.
-
-Figure~\ref{fig:occlusion_en} illustrates a vehicle traveling from east to north that becomes fully occluded by a bus. A new track ID is assigned upon reappearance, which the post-processing step correctly associates with the original track fragment, preventing a lost count. Figure~\ref{fig:occlusion_ns} shows an analogous event on the N$\to$S route, where a vehicle is occluded by a semi-trailer and subsequently re-identified.
+Figure~\ref{fig:occlusion_en} illustrates a vehicle traveling from east to north that becomes fully occluded by a bus. A new track ID is assigned upon reappearance, which the post-processing step correctly associates with the original track fragment, preventing a lost count. 
 
 \begin{figure}[H]
 \centering
@@ -304,10 +301,12 @@ Figure~\ref{fig:occlusion_en} illustrates a vehicle traveling from east to north
     \includegraphics[width=\linewidth]{project/images/OCC_EN_afters.png}
 \end{minipage}
 \caption[Occlusion and subsequent recovery of a vehicle traveling from east to north.]{Occlusion and subsequent recovery of a vehicle traveling from east to north.
-Left: vehicle visible prior to occlusion. Center: vehicle fully occluded by bus.
-Right: vehicle reappears with a new track ID, subsequently merged with the original fragment.}
+\textbf{Left:} vehicle visible prior to occlusion (ID: 396). \textbf{Center:} vehicle fully occluded by bus.
+\textbf{Right:} vehicle reappears with a new track ID  (414), subsequently merged with the original fragment.}
 \label{fig:occlusion_en}
 \end{figure}
+
+Figure~\ref{fig:occlusion_ns} shows another occlusion event, this time on the N$\to$S route, where a vehicle is occluded by a semi-trailer and subsequently re-identified.
 
 \begin{figure}[H]
 \centering
@@ -324,21 +323,21 @@ Right: vehicle reappears with a new track ID, subsequently merged with the origi
     \includegraphics[width=\linewidth]{project/images/OCC_NS_after.png}
 \end{minipage}
 \caption[Occlusion and subsequent recovery of a vehicle traveling from north to south.]{Occlusion and subsequent recovery of a vehicle traveling from north to south.
-Left: vehicle visible prior to occlusion. Center: vehicle fully occluded by semi-trailer.
-Right: vehicle reappears with a new track ID, subsequently merged with the original fragment.}
+\textbf{Left:} vehicle visible prior to occlusion (ID: 155). \textbf{Center:} vehicle fully occluded by semi-trailer.
+\textbf{Right:} vehicle reappears with a new track ID (163), subsequently merged with the original fragment.}
 \label{fig:occlusion_ns}
 \end{figure}
 
-\subsection{Night-Time Tracking Performance}
+\subsection{Nighttime Tracking Performance}
 \label{subsec:nighttime_tracking}
 
-To evaluate robustness under low-light conditions, the pipeline was tested on a one-hour night-time video segment. In addition to the standard tracker configurations, a custom
-Night BoT-SORT Conservative variant was developed specifically for low-light conditions. No pedestrians crossed the road during the night-time footage, so no pedestrian detection results are reported.
+To evaluate robustness under low-light conditions, the pipeline was tested on a 1-hour nighttime video segment. In addition to the standard tracker configurations, a custom
+Night BoT-SORT Conservative variant was developed specifically for low-light conditions. Pedestrian detection is excluded from this evaluation because no pedestrian crossings occurred in the nighttime segment.
 
-\subsubsection{Comparative Analysis: 1-Hour Evaluation}
+\subsubsection{Comparative Results: 1-Hour Evaluation}
 
 Table~\ref{tab:od_nighttime_all} presents the performance of all six model-tracker
-combinations evaluated on the night-time segment. YOLO26m + BoT-SORT Conservative achieves the lowest route error (3.7\%) and total count error (1.5\%), predicting 132 vehicles against a ground truth of 134. YOLO26m + ByteTrack ranks second by route error (4.1\%), with a total count error of 3.7\%, followed by YOLO26m + BoT-SORT at 5.0\% route error and 4.5\% total count error. All three YOLO26n configurations produce substantially higher route errors, ranging from 22.9\% to 33.3\%, despite comparable or lower class errors. YOLO26n + BoT-SORT Conservative achieves the lowest class error within the YOLO26n family (8.2\%) and the smallest total count error in that group (2.2\%), but its route error of 22.9\% is third highest.
+combinations evaluated on the nighttime segment. YOLO26m + BoT-SORT Conservative achieves the lowest route error (3.7\%) and total count error (1.5\%), predicting 132 vehicles against a ground truth of 134. YOLO26m + ByteTrack ranks second by route error (4.1\%), with a total count error of 3.7\%, followed by YOLO26m + BoT-SORT at 5.0\% route error and 4.5\% total count error. All three YOLO26n configurations produce substantially higher route errors, ranging from 22.9\% to 33.3\%, despite comparable or lower class errors. YOLO26n + BoT-SORT Conservative achieves the lowest class error within the YOLO26n family (8.2\%) and the smallest total count error in that group (2.2\%), but its route error of 22.9\% is the third highest.
 
 \begin{table}[H]
 \caption{Nighttime results: all model-tracker combinations.}
@@ -359,20 +358,20 @@ YOLO26n & ByteTrack        & 9.7\%  & 33.3\% & 3.7\% & 402 \\
 \label{tab:od_nighttime_all}
 \end{table}
 
-The per-class prediction counts for all configurations are shown in
-Figure~\ref{fig:class_comp_night}.
+The per-class prediction counts for all configurations are shown in Figure~\ref{fig:class_comp_night}. The YOLO26n model struggles with the \textit{Light Truck} and \textit{Heavy Truck} classes, producing zero predictions for both, likely due to misclassification into the \textit{Semi-trailer} category, which shows a higher prediction count.
+
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\linewidth]{project/images/nighttime_class_composition2.png}
-    \caption{Predicted vehicle-class composition for night-time model-tracker combinations,
-    compared with ground truth. Raw counts (symlog scale).}
+    \caption{Predicted vehicle-class composition for nighttime configurations,
+    compared with ground truth (GT). Raw counts (symlog scale).}
     \label{fig:class_comp_night}
 \end{figure}
 
 \subsubsection{Per-Class Error Analysis}
 
-Table~\ref{tab:nighttime_class_errors} shows that YOLO26m configurations consistently outperform YOLO26n across most classes, with low errors for cars, light trucks, and buses. BoT-SORT Conservative performs best overall, except for heavy trucks where ByteTrack has slightly lower error, though all models struggle in this class.
-In contrast, YOLO26n configurations exhibit clear weaknesses, with 100\% error for light trucks and motorcycles and generally large deviations across other classes, indicating poor fine-grained classification at night.
+Table~\ref{tab:nighttime_class_errors} shows that YOLO26m configurations mostly perform better than YOLO26n, with low errors for cars, light trucks, and bus. BoT-SORT Conservative in combination with YOLO26m, performs best overall, except for heavy trucks, where ByteTrack has a slightly lower error, though all models struggle in this class. In contrast, YOLO26n configurations exhibit clear weaknesses, with 100\% error for light trucks and motorcycles.
 
 \begin{table}[H]
 \caption{Nighttime class error (all values in \%) for all model-tracker combinations.}
@@ -384,7 +383,7 @@ In contrast, YOLO26n configurations exhibit clear weaknesses, with 100\% error f
  & & \textbf{Truck} & \textbf{Truck} & \textbf{Trailer} & & \\
 \midrule
 YOLO26m BoT-SORT Cons. & \textbf{0.8} & \textbf{0.0} & 250.0 & 71.4 & \textbf{0.0} & \textbf{50.0} \\
-YOLO26m ByteTrack       & 2.5 & \textbf{0.0} & \textbf{200.0} & 57.1 & \textbf{0.0} & 100.0 \\
+YOLO26m ByteTrack       & 2.5 & \textbf{0.0} & 200.0 & 57.1 & \textbf{0.0} & 100.0 \\
 YOLO26m BoT-SORT        & 3.3 & \textbf{0.0} & 250.0 & 71.4 & \textbf{0.0} & 100.0 \\
 YOLO26n ByteTrack       & 5.0 & 100.0 & \textbf{100.0} & \textbf{28.6} & \textbf{0.0} & 100.0 \\
 YOLO26n BoT-SORT        & 5.0 & 100.0 & \textbf{100.0} & \textbf{28.6} & \textbf{0.0} & 100.0 \\
@@ -394,15 +393,15 @@ YOLO26n BoT-SORT Cons.  & 3.3 & 100.0 & \textbf{100.0} & \textbf{28.6} & \textbf
 \label{tab:nighttime_class_errors}
 \end{table}
 
-\subsubsection{Best Night-Time Configuration: YOLO26m + BoT-SORT Conservative}
+\subsubsection{Best Nighttime Configuration: YOLO26m + BoT-SORT Conservative}
 
-The best-performing night-time configuration predicts 132 vehicles compared to a ground truth of 134, corresponding to a net deviation of $-2$ vehicles and a total count error of 1.5\%. The class-wise and route-wise errors are 9.0\% and 3.7\%, respectively (see \autoref{tab:od_nighttime_all}).
+The best-performing nighttime configuration predicts 132 vehicles compared to a ground truth of 134, corresponding to a net deviation of $-2$ vehicles and a total count error of 1.5\%. The class- and route-errors are 9.0\% and 3.7\%, respectively (see \autoref{tab:od_nighttime_all}).
 
-The full origin--destination matrix is shown in \autoref{tab:od_nighttime_best}, with the corresponding error analysis in \autoref{tab:od_nighttime_error}. Traffic is dominated by the S$\to$N and N$\to$S movements, with 68 and 58 predicted vehicles, respectively, accounting for 95.5\% of total flow. All minor turning movements are predicted without deviation. The S$\to$N movement shows no net error, while N$\to$S is underpredicted by two vehicles.
+The full O-D matrix is shown in \autoref{tab:od_nighttime_best}, with the corresponding error analysis in \autoref{tab:od_nighttime_error}. Traffic is dominated by the S$\to$N and N$\to$S movements, with 68 and 58 predicted vehicles, respectively, accounting for 95.5\% of total flow. All minor turning movements are predicted without deviation. The S$\to$N movement shows no net error, while N$\to$S is underpredicted by two vehicles.
 
 \begin{table}[H]
-\caption{Predicted O--D vehicle counts for YOLO26m with BoT-SORT Conservative under
-night-time conditions.}
+\caption{Predicted O-D vehicle counts for YOLO26m with BoT-SORT Conservative under
+nighttime conditions.}
 \centering
 \small
 \begin{tabular}{l c c c c c c c c}
@@ -425,7 +424,7 @@ N$\to$E & 0  & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
 
 \begin{table}[H]
 \caption{Error analysis (predicted $-$ ground truth) for YOLO26m with BoT-SORT
-Conservative under night-time conditions. GT total = 134 vehicles.}
+Conservative under nighttime conditions. GT total = 134 vehicles.}
 \centering
 \small
 \begin{tabular}{l c c c c c c c c c}
@@ -452,9 +451,9 @@ At the class level, cars dominate the traffic (119 of 132 vehicles) and are pred
 
 \subsection{Adaptive Dual-Tracker Configuration}
 
-To enable continuous operation under varying lighting conditions, an adaptive dual-tracker setup was evaluated by combining the best daytime and best nighttime configurations with automatic switching. A 10-minute twilight sequence containing a single day–night transition in the SVV stream was used for evaluation.
+To enable continuous operation under varying lighting conditions, an adaptive dual-tracker setup was evaluated by combining the best day- and nighttime configurations with automatic switching. A 10-minute twilight sequence containing a single day–night transition in the SVV stream was used for evaluation.
 
-As shown in Table~\ref{tab:od_transition}, the dual-tracker configuration achieves 0.0\% class, route, and total error. The predicted origin–destination matrix in \autoref{tab:od_twilight_best} matches the ground truth exactly, with zero deviations across all routes and vehicle classes.
+As shown in Table~\ref{tab:od_transition}, the dual-tracker configuration achieves 0.0\% class, route, and total error. The predicted O-D matrix in \autoref{tab:od_twilight_best} matches the ground truth exactly, with zero deviations across all routes and vehicle classes.
 These results indicate that the switching mechanism operates reliably during lighting transitions, maintaining consistent O–D counting performance without introducing additional errors.
 
 \begin{table}[H]
@@ -474,7 +473,7 @@ YOLO26m & Dual-Tracker & 0.0\% & 0.0\% & 0.0\% & 0 & 315 \\
 \end{table}
 
 \begin{table}[H]
-\caption{Predicted O--D vehicle counts for adaptive dual-tracker system (twilight segment, 10 minutes).}
+\caption{Predicted O-D vehicle counts for adaptive dual-tracker system (twilight segment, 10 minutes).}
 \centering
 \small
 \begin{tabular}{l c c c c c c c c}
@@ -497,4 +496,4 @@ N$\to$E & 0  & 0 & 0 & 0 & 0 & 0 & 0 & 0  \\
 \end{table}
 
 \subsection{CPU Runtime Performance}
-In the 15-minute daytime video segment, we benchmarked the most lightweight end-to-end configuration (YOLO26n + ByteTrack) to estimate the computational feasibility of operational deployment. The full pipeline (detection + tracking + O--D counting) achieved 67.6 FPS on a \mbox{NVIDIA Tesla T4} GPU (Google Colab) and approximately 14 FPS on CPU using the exported ONNX model with ONNX Runtime (Google Colab; 2 vCPUs on an Intel(R) Xeon(R) CPU @ 2.00\,GHz).
+In the 15-minute daytime video segment, we benchmarked the most lightweight end-to-end configuration (YOLO26n + ByteTrack) to estimate the computational feasibility of operational deployment. The full pipeline (detection + tracking + O-D counting) achieved 67.6 FPS on a \mbox{NVIDIA Tesla T4} GPU (Google Colab) and approximately 14 FPS on CPU using the exported ONNX model with ONNX Runtime (Google Colab; 2 vCPUs on an Intel(R) Xeon(R) CPU @ 2.00\,GHz).
