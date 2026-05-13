@@ -1,5 +1,5 @@
-# Vehicle Tracking & Counting System
-## Adaptive Day/Night Tracking for Road Traffic Analysis
+# Automated Intersection Analytics:
+## Deep Learning-Based Traffic Monitoring under Real-World Conditions
 
 A tracking pipeline developed for a master's thesis, for evaluating vehicle detection and tracking across day and night conditions with dynamic tracker switching and post-processing recovery.
 
@@ -97,8 +97,12 @@ pip install torch torchvision torchaudio --index-url https://download.pytorch.or
 
 ### 2. Prepare Data
 
-The project videos can be found here:
-https://drive.google.com/drive/folders/1URVaRy9w-l9IAbhufSzgE5KuEVjegVE2
+Training outputs and datasets are available here:
+https://drive.google.com/drive/folders/1NkWN7G3pADlT1_Fy0xBrRFxEqEnBW7Qv
+
+The Drive folder contains:
+- `YOLO results/`: YOLO26n / YOLO26m tuning results
+- `Data/`: train/val/test split and the videos used for tracking
 
 **Required Files Structure:**
 ```
