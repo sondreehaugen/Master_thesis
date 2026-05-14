@@ -410,7 +410,7 @@ For thesis or publication:
 ```bibtex
 @thesis{haugen_2026,
     author = {Sondre Eliassen Haugen and Eirik \AA rdal Hjelm},
-  title = {Exploring Machine Vision for Vehicle and Object Detection in Road Environments},
+  title = {Automated Intersection Analytics: Deep Learning-Based Traffic Monitoring under Real-World Conditions},
     school = {Norwegian University of Life Sciences (NMBU)},
   year = {2026}
 }
